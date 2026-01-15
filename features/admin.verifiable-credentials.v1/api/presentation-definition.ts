@@ -46,11 +46,21 @@ export const getPresentationDefinitions = (): Promise<PresentationDefinitionInte
         url: store.getState().config.endpoints.presentationDefinitions
     };
 
+    console.log("GET /presentation-definitions: Fetching list");
+
     return httpClient(requestConfig)
         .then((response: AxiosResponse) => {
+            console.log("GET /presentation-definitions: Success", response?.data);
+
             return Promise.resolve(response?.data as PresentationDefinitionInterface[]);
         })
         .catch((error: AxiosError) => {
+            console.error("GET /presentation-definitions: Error", {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
             return Promise.reject(error);
         });
 };
@@ -70,11 +80,21 @@ export const getPresentationDefinition = (id: string): Promise<PresentationDefin
         url: `${store.getState().config.endpoints.presentationDefinitions}/${id}`
     };
 
+    console.log(`GET /presentation-definitions/${id}: Fetching definition`);
+
     return httpClient(requestConfig)
         .then((response: AxiosResponse) => {
+            console.log(`GET /presentation-definitions/${id}: Success`, response?.data);
+
             return Promise.resolve(response?.data);
         })
         .catch((error: AxiosError) => {
+            console.error(`GET /presentation-definitions/${id}: Error`, {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
             return Promise.reject(error);
         });
 };
@@ -97,11 +117,21 @@ export const createPresentationDefinition = (
         url: store.getState().config.endpoints.presentationDefinitions
     };
 
+    console.log("POST /presentation-definitions: Creating definition", data);
+
     return httpClient(requestConfig)
         .then((response: AxiosResponse) => {
+            console.log("POST /presentation-definitions: Success", response?.data);
+
             return Promise.resolve(response?.data);
         })
         .catch((error: AxiosError) => {
+            console.error("POST /presentation-definitions: Error", {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
             return Promise.reject(error);
         });
 };
@@ -126,11 +156,21 @@ export const updatePresentationDefinition = (
         url: `${store.getState().config.endpoints.presentationDefinitions}/${id}`
     };
 
+    console.log(`PUT /presentation-definitions/${id}: Updating definition`, data);
+
     return httpClient(requestConfig)
         .then((response: AxiosResponse) => {
+            console.log(`PUT /presentation-definitions/${id}: Success`, response?.data);
+
             return Promise.resolve(response?.data);
         })
         .catch((error: AxiosError) => {
+            console.error(`PUT /presentation-definitions/${id}: Error`, {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
             return Promise.reject(error);
         });
 };
@@ -150,11 +190,21 @@ export const deletePresentationDefinition = (id: string): Promise<AxiosResponse>
         url: `${store.getState().config.endpoints.presentationDefinitions}/${id}`
     };
 
+    console.log(`DELETE /presentation-definitions/${id}: Deleting definition`);
+
     return httpClient(requestConfig)
         .then((response: AxiosResponse) => {
+            console.log(`DELETE /presentation-definitions/${id}: Success`, response?.data);
+
             return Promise.resolve(response);
         })
         .catch((error: AxiosError) => {
+            console.error(`DELETE /presentation-definitions/${id}: Error`, {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
             return Promise.reject(error);
         });
 };

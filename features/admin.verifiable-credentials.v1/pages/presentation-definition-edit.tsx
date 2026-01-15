@@ -82,6 +82,7 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
             setDefinitionJson(definition.definitionJson);
         } else if (isNew) {
             setDefinitionJson(JSON.stringify({
+                "id": `definition-${Math.random().toString(36).substring(2, 9)}`,
                 "input_descriptors": [
                     {
                         "id": "identity_credential",
@@ -116,15 +117,20 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
         }
     }, [prefixError]);
 
-    const handleFormSubmit = (values: Map<string, any>): void => {
-        const name: string = values.get("name").toString();
-        const description: string = values.get("description")?.toString();
+    const handleFormSubmit = (values: any): void => {
+        console.log("handleFormSubmit: Start", values);
+
+        const name: string = values instanceof Map ? values.get("name")?.toString() : values.name;
+        const description: string = values instanceof Map ? values.get("description")?.toString() : values.description;
+
+        console.log("handleFormSubmit: Extracted values", { name, description, definitionJson });
 
         let parsedJson: any;
 
         try {
             parsedJson = JSON.parse(definitionJson);
         } catch (e) {
+            console.error("handleFormSubmit: JSON parse error", e);
             dispatch(addAlert<AlertInterface>({
                 description: "Invalid JSON format in definition.",
                 level: AlertLevels.ERROR,
@@ -134,33 +140,49 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
             return;
         }
 
+        if (!parsedJson.id) {
+            console.error("handleFormSubmit: Missing 'id' in JSON");
+            dispatch(addAlert<AlertInterface>({
+                description: "The Presentation Definition JSON must contain a top-level 'id' field.",
+                level: AlertLevels.ERROR,
+                message: "Missing ID in JSON"
+            }));
+
+            return;
+        }
+
         setIsSubmitting(true);
 
         const data: PresentationDefinitionInterface = {
-            definitionId: !isNew ? definitionId : undefined,
-            definitionJson: JSON.stringify(parsedJson), // Ensure minified or use formatting preference
+            definitionId: isNew ? parsedJson.id : definitionId,
+            definitionJson: JSON.stringify(parsedJson),
             description,
             name
         };
+
+        console.log(`handleFormSubmit: Calling ${isNew ? "create" : "update"} API`, data);
 
         const apiCall: Promise<PresentationDefinitionInterface> = isNew
             ? createPresentationDefinition(data)
             : updatePresentationDefinition(definitionId, data);
 
         apiCall
-            .then(() => {
+            .then((response: any) => {
+                console.log("handleFormSubmit: API Success", response);
                 dispatch(addAlert<AlertInterface>({
                     description: isNew ? "Successfully created presentation definition." : "Successfully updated presentation definition.",
                     level: AlertLevels.SUCCESS,
                     message: isNew ? "Creation Successful" : "Update Successful"
                 }));
                 if (isNew) {
+                    console.log("handleFormSubmit: Redirecting to list");
                     history.push(AppConstants.getPaths().get("PRESENTATION_DEFINITIONS"));
                 } else {
                     mutateDefinition();
                 }
             })
             .catch((error: any) => {
+                console.error("handleFormSubmit: API Error", error);
                 dispatch(addAlert<AlertInterface>({
                     description: error?.response?.data?.description || "Error saving presentation definition.",
                     level: AlertLevels.ERROR,
@@ -275,13 +297,15 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
                         </Grid.Row>
                         <Grid.Row columns={1}>
                             <Grid.Column mobile={16} tablet={16} computer={10}>
-                                <PrimaryButton
-                                    type="submit"
+                                <Field.Button
+                                    form={`${componentId}-form`}
+                                    size="small"
+                                    buttonType="primary_btn"
+                                    ariaLabel="submit"
+                                    name="submit"
                                     loading={isSubmitting}
-                                    data-componentid={`${componentId}-submit-button`}
-                                >
-                                    {isNew ? "Create" : "Update"}
-                                </PrimaryButton>
+                                    label={isNew ? "Create" : "Update"}
+                                />
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
