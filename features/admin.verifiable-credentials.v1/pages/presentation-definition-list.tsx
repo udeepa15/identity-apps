@@ -96,6 +96,7 @@ const PresentationDefinitionListPage = ({
                 currentListSize={definitionList?.length ?? 0}
                 isLoading={isListLoading}
                 showPagination={false}
+                onPageChange={() => { /* dummy */ }}
                 showTopActionPanel={
                     isListLoading || (definitionList?.length > 0)
                 }

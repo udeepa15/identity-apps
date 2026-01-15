@@ -30,7 +30,6 @@ import {
     PageLayout,
     PrimaryButton
 } from "@wso2is/react-components";
-import { FormValidation } from "@wso2is/validation";
 import React, { FunctionComponent, ReactElement, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
@@ -117,7 +116,7 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
         }
     }, [prefixError]);
 
-    const handleFormSubmit = (values: Map<string, FormValidation>): void => {
+    const handleFormSubmit = (values: Map<string, any>): void => {
         const name: string = values.get("name").toString();
         const description: string = values.get("description")?.toString();
 
@@ -228,6 +227,8 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
                                     label="Name"
                                     required={true}
                                     placeholder="Enter defined name"
+                                    maxLength={100}
+                                    minLength={3}
                                     validation={(value: string) => {
                                         if (!value) {
                                             return "Name is required";
@@ -245,6 +246,8 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
                                     label="Description"
                                     required={false}
                                     placeholder="Enter description"
+                                    maxLength={1000}
+                                    minLength={0}
                                     data-componentid={`${componentId}-description`}
                                 />
                             </Grid.Column>
