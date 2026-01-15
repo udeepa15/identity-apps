@@ -224,13 +224,10 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
      * @param values - Form values.
      */
     const handleFormSubmit = (values: any): void => {
-        console.log("handleFormSubmit: Form submitted", { values });
         setIsSubmitting(true);
 
         // When using uncontrolledForm={true}, values is a plain object, not a Map
         const selectedPresentationDefinitionId = values.presentationDefinitionId || "";
-
-        console.log("handleFormSubmit: Selected presentation definition ID", { selectedPresentationDefinitionId });
 
         const updatedAuthSequence = updateAuthenticatorProperty(
             application.authenticationSequence,
@@ -238,16 +235,45 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
             selectedPresentationDefinitionId
         );
 
-        const updatedApplication = {
-            id: application.id,
-            authenticationSequence: updatedAuthSequence
+        // Sanitize the authentication sequence to remove unnecessary fields
+        // The API only expects strictly defined fields in the update payload
+        const sanitizedSteps = updatedAuthSequence.steps?.map((step: AuthenticationStepInterface) => {
+            return {
+                id: step.id,
+                options: step.options?.map((option: any) => {
+                    const sanitizedOption: any = {
+                        authenticator: option.authenticator,
+                        idp: option.idp
+                    };
+
+                    // Only include properties if they exist and are not empty
+                    if (option.properties && option.properties.length > 0) {
+                        sanitizedOption.properties = option.properties;
+                    }
+
+                    return sanitizedOption;
+                })
+            };
+        });
+
+        // Construct the authentication sequence with only allowed fields
+        const payloadAuthenticationSequence = {
+            attributeStepId: updatedAuthSequence.attributeStepId,
+            requestPathAuthenticators: updatedAuthSequence.requestPathAuthenticators,
+            script: updatedAuthSequence.script,
+            steps: sanitizedSteps,
+            subjectStepId: updatedAuthSequence.subjectStepId,
+            type: updatedAuthSequence.type
         };
 
-        console.log("handleFormSubmit: Updating application", { updatedApplication });
+        const updatedApplication = {
+            id: application.id,
+            authenticationSequence: payloadAuthenticationSequence
+        };
 
-        updateApplicationDetails(updatedApplication as ApplicationInterface)
+        // Cast to unknown then ApplicationInterface to bypass strict type checking for partial updates
+        updateApplicationDetails(updatedApplication as unknown as ApplicationInterface)
             .then(() => {
-                console.log("handleFormSubmit: Update successful");
                 dispatch(addAlert({
                     description: t("applications:notifications.updateApplication.success.description"),
                     level: AlertLevels.SUCCESS,
@@ -256,7 +282,6 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
                 onUpdate(application.id);
             })
             .catch((error: any) => {
-                console.error("handleFormSubmit: Update failed", { error });
                 dispatch(addAlert({
                     description: error?.response?.data?.description ||
                         t("applications:notifications.updateApplication.error.description"),
