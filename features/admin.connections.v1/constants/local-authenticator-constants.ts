@@ -50,6 +50,7 @@ export class LocalAuthenticatorConstants {
         SMS_OTP_AUTHENTICATOR_ID: string;
         TOTP_AUTHENTICATOR_ID: string;
         X509_CERTIFICATE_AUTHENTICATOR_ID: string;
+        OPENID4VP_AUTHENTICATOR_ID: string;
     } = {
             ACTIVE_SESSION_LIMIT_HANDLER_AUTHENTICATOR_ID: "U2Vzc2lvbkV4ZWN1dG9y",
             BACKUP_CODE_AUTHENTICATOR_ID: "YmFja3VwLWNvZGUtYXV0aGVudGljYXRvcg",
@@ -63,7 +64,8 @@ export class LocalAuthenticatorConstants {
             PUSH_AUTHENTICATOR_ID: "cHVzaC1ub3RpZmljYXRpb24tYXV0aGVudGljYXRvcg",
             SMS_OTP_AUTHENTICATOR_ID: "c21zLW90cC1hdXRoZW50aWNhdG9y",
             TOTP_AUTHENTICATOR_ID: "dG90cA",
-            X509_CERTIFICATE_AUTHENTICATOR_ID: "eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg"
+            X509_CERTIFICATE_AUTHENTICATOR_ID: "eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg",
+            OPENID4VP_AUTHENTICATOR_ID: "T3BlbklENFZQQXV0aGVudGljYXRvcg"
         };
 
     /**
@@ -81,6 +83,7 @@ export class LocalAuthenticatorConstants {
         PUSH_AUTHENTICATOR_NAME: string,
         SMS_OTP_AUTHENTICATOR_NAME: string;
         TOTP_AUTHENTICATOR_NAME: string;
+        OPENID4VP_AUTHENTICATOR_NAME: string;
     } = {
             ACTIVE_SESSION_LIMIT_HANDLER_AUTHENTICATOR_NAME: "SessionExecutor",
             BACKUP_CODE_AUTHENTICATOR_NAME: "backup-code-authenticator",
@@ -92,7 +95,8 @@ export class LocalAuthenticatorConstants {
             PASSIVE_STS_AUTHENTICATOR_NAME: "PassiveSTSAuthenticator",
             PUSH_AUTHENTICATOR_NAME: "push-notification-authenticator",
             SMS_OTP_AUTHENTICATOR_NAME: "sms-otp-authenticator",
-            TOTP_AUTHENTICATOR_NAME: "totp"
+            TOTP_AUTHENTICATOR_NAME: "totp",
+            OPENID4VP_AUTHENTICATOR_NAME: "OpenID4VPAuthenticator"
         };
 
     // FIDO authenticator constants.

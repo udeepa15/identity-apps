@@ -39,7 +39,8 @@ import {
     GithubAuthenticatorForm,
     GoogleAuthenticatorForm,
     MicrosoftAuthenticatorForm,
-    SMSOTPAuthenticatorForm
+    SMSOTPAuthenticatorForm,
+    OpenID4VPAuthenticatorForm
 } from "../authenticators";
 import { SamlAuthenticatorSettingsForm } from "../authenticators/saml-authenticator-form";
 import { SIWEAuthenticatorForm } from "../authenticators/swe-authenticator-form";
@@ -128,7 +129,7 @@ export const AuthenticatorFormFactory: FunctionComponent<AuthenticatorFormFactor
         isReadOnly,
         isSubmitting,
         templateId,
-        [ "data-testid" ]: testId
+        ["data-testid"]: testId
     } = props;
 
     /**
@@ -156,16 +157,16 @@ export const AuthenticatorFormFactory: FunctionComponent<AuthenticatorFormFactor
     if (templateId === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.EXPERT_MODE) {
         return (
             <CommonAuthenticatorForm
-                mode={ mode }
-                initialValues={ initialValues }
-                metadata={ metadata }
-                onSubmit={ onSubmit }
-                triggerSubmit={ triggerSubmit }
-                enableSubmitButton={ enableSubmitButton }
-                data-testid={ testId }
-                showCustomProperties={ showCustomProperties }
-                readOnly={ isReadOnly }
-                isSubmitting={ isSubmitting }
+                mode={mode}
+                initialValues={initialValues}
+                metadata={metadata}
+                onSubmit={onSubmit}
+                triggerSubmit={triggerSubmit}
+                enableSubmitButton={enableSubmitButton}
+                data-testid={testId}
+                showCustomProperties={showCustomProperties}
+                readOnly={isReadOnly}
+                isSubmitting={isSubmitting}
             />
         );
     }
@@ -174,116 +175,130 @@ export const AuthenticatorFormFactory: FunctionComponent<AuthenticatorFormFactor
         case FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.GOOGLE_OIDC_AUTHENTICATOR_ID:
             return (
                 <GoogleAuthenticatorForm
-                    mode={ mode }
-                    initialValues={ initialValues }
-                    metadata={ metadata }
-                    onSubmit={ onSubmit }
-                    triggerSubmit={ triggerSubmit }
-                    enableSubmitButton={ enableSubmitButton }
-                    data-testid={ testId }
-                    showCustomProperties={ showCustomProperties }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    mode={mode}
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-testid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
         case FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.FACEBOOK_AUTHENTICATOR_ID:
             return (
                 <FacebookAuthenticatorForm
-                    mode={ mode }
-                    initialValues={ initialValues }
-                    metadata={ metadata }
-                    onSubmit={ onSubmit }
-                    triggerSubmit={ triggerSubmit }
-                    enableSubmitButton={ enableSubmitButton }
-                    data-testid={ testId }
-                    showCustomProperties={ showCustomProperties }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    mode={mode}
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-testid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
         case FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.GITHUB_AUTHENTICATOR_ID:
             return (
                 <GithubAuthenticatorForm
-                    mode={ mode }
-                    initialValues={ initialValues }
-                    metadata={ metadata }
-                    onSubmit={ onSubmit }
-                    triggerSubmit={ triggerSubmit }
-                    enableSubmitButton={ enableSubmitButton }
-                    data-testid={ testId }
-                    showCustomProperties={ showCustomProperties }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    mode={mode}
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-testid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
         case LocalAuthenticatorConstants.AUTHENTICATOR_IDS.EMAIL_OTP_AUTHENTICATOR_ID:
             return (
                 <EmailOTPAuthenticatorForm
-                    mode={ mode }
-                    initialValues={ initialValues }
-                    metadata={ metadata }
-                    onSubmit={ onSubmit }
-                    triggerSubmit={ triggerSubmit }
-                    enableSubmitButton={ enableSubmitButton }
-                    data-testid={ testId }
-                    showCustomProperties={ showCustomProperties }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    mode={mode}
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-testid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
         case LocalAuthenticatorConstants.AUTHENTICATOR_IDS.SMS_OTP_AUTHENTICATOR_ID:
             return (
                 <SMSOTPAuthenticatorForm
-                    initialValues={ initialValues }
-                    metadata={ metadata }
-                    onSubmit={ onSubmit }
-                    triggerSubmit={ triggerSubmit }
-                    enableSubmitButton={ enableSubmitButton }
-                    data-testid={ testId }
-                    showCustomProperties={ showCustomProperties }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-testid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
+                />
+            );
+        case LocalAuthenticatorConstants.AUTHENTICATOR_IDS.OPENID4VP_AUTHENTICATOR_ID:
+            return (
+                <OpenID4VPAuthenticatorForm
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-testid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
         case FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.SAML_AUTHENTICATOR_ID:
             return (
                 <SamlAuthenticatorSettingsForm
-                    mode={ mode }
-                    onSubmit={ onSubmit }
-                    authenticator={ authenticator }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    mode={mode}
+                    onSubmit={onSubmit}
+                    authenticator={authenticator}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
         case FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.MICROSOFT_AUTHENTICATOR_ID:
-            if (templateId === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.MICROSOFT){
-                return(
+            if (templateId === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.MICROSOFT) {
+                return (
                     <MicrosoftAuthenticatorForm
-                        mode={ mode }
-                        initialValues={ initialValues }
-                        metadata={ metadata }
-                        onSubmit={ onSubmit }
-                        triggerSubmit={ triggerSubmit }
-                        enableSubmitButton={ enableSubmitButton }
-                        data-testid={ testId }
-                        showCustomProperties={ showCustomProperties }
-                        readOnly={ isReadOnly }
-                        isSubmitting={ isSubmitting }
+                        mode={mode}
+                        initialValues={initialValues}
+                        metadata={metadata}
+                        onSubmit={onSubmit}
+                        triggerSubmit={triggerSubmit}
+                        enableSubmitButton={enableSubmitButton}
+                        data-testid={testId}
+                        showCustomProperties={showCustomProperties}
+                        readOnly={isReadOnly}
+                        isSubmitting={isSubmitting}
                     />
                 );
             } else {
                 return (
                     <CommonAuthenticatorForm
-                        mode={ mode }
-                        initialValues={ initialValues }
-                        metadata={ metadata }
-                        onSubmit={ onSubmit }
-                        triggerSubmit={ triggerSubmit }
-                        enableSubmitButton={ enableSubmitButton }
-                        data-testid={ testId }
-                        showCustomProperties={ showCustomProperties }
-                        readOnly={ isReadOnly }
-                        isSubmitting={ isSubmitting }
+                        mode={mode}
+                        initialValues={initialValues}
+                        metadata={metadata}
+                        onSubmit={onSubmit}
+                        triggerSubmit={triggerSubmit}
+                        enableSubmitButton={enableSubmitButton}
+                        data-testid={testId}
+                        showCustomProperties={showCustomProperties}
+                        readOnly={isReadOnly}
+                        isSubmitting={isSubmitting}
                     />
                 );
             }
@@ -292,15 +307,15 @@ export const AuthenticatorFormFactory: FunctionComponent<AuthenticatorFormFactor
             if (templateId === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.SWE) {
                 return (
                     <SIWEAuthenticatorForm
-                        data-componentid={ testId }
-                        enableSubmitButton={ enableSubmitButton }
-                        initialValues={ initialValues }
-                        isSubmitting={ isSubmitting }
-                        metadata={ metadata }
-                        onSubmit={ onSubmit }
-                        readOnly={ isReadOnly }
-                        showCustomProperties={ showCustomProperties }
-                        triggerSubmit={ triggerSubmit }
+                        data-componentid={testId}
+                        enableSubmitButton={enableSubmitButton}
+                        initialValues={initialValues}
+                        isSubmitting={isSubmitting}
+                        metadata={metadata}
+                        onSubmit={onSubmit}
+                        readOnly={isReadOnly}
+                        showCustomProperties={showCustomProperties}
+                        triggerSubmit={triggerSubmit}
                     />
                 );
             }
@@ -311,15 +326,15 @@ export const AuthenticatorFormFactory: FunctionComponent<AuthenticatorFormFactor
             if (templateId === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.HYPR) {
                 return (
                     <CommonAuthenticatorForm
-                        mode={ mode }
-                        onSubmit={ onSubmit }
-                        initialValues={ initialValues }
-                        enableSubmitButton={ enableSubmitButton }
-                        triggerSubmit={ triggerSubmit }
-                        metadata={ metadata }
-                        data-testid={ testId }
-                        showCustomProperties={ showCustomProperties }
-                        readOnly={ isReadOnly }
+                        mode={mode}
+                        onSubmit={onSubmit}
+                        initialValues={initialValues}
+                        enableSubmitButton={enableSubmitButton}
+                        triggerSubmit={triggerSubmit}
+                        metadata={metadata}
+                        data-testid={testId}
+                        showCustomProperties={showCustomProperties}
+                        readOnly={isReadOnly}
                     />
                 );
             }
@@ -329,33 +344,33 @@ export const AuthenticatorFormFactory: FunctionComponent<AuthenticatorFormFactor
         case FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.APPLE_AUTHENTICATOR_ID:
             return (
                 <AppleAuthenticatorForm
-                    mode={ mode }
-                    initialValues={ initialValues }
-                    metadata={ metadata }
-                    onSubmit={ onSubmit }
-                    triggerSubmit={ triggerSubmit }
-                    enableSubmitButton={ enableSubmitButton }
-                    data-componentid={ testId }
-                    showCustomProperties={ showCustomProperties }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    mode={mode}
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-componentid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
 
         default:
             return (
                 <AuthenticatorSettingsForm
-                    connectorSettings={ connectionSettingsMetaData }
-                    mode={ mode }
-                    initialValues={ initialValues }
-                    metadata={ metadata }
-                    onSubmit={ onSubmit }
-                    triggerSubmit={ triggerSubmit }
-                    enableSubmitButton={ enableSubmitButton }
-                    data-testid={ testId }
-                    showCustomProperties={ showCustomProperties }
-                    readOnly={ isReadOnly }
-                    isSubmitting={ isSubmitting }
+                    connectorSettings={connectionSettingsMetaData}
+                    mode={mode}
+                    initialValues={initialValues}
+                    metadata={metadata}
+                    onSubmit={onSubmit}
+                    triggerSubmit={triggerSubmit}
+                    enableSubmitButton={enableSubmitButton}
+                    data-testid={testId}
+                    showCustomProperties={showCustomProperties}
+                    readOnly={isReadOnly}
+                    isSubmitting={isSubmitting}
                 />
             );
     }

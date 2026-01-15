@@ -20,3 +20,6 @@ export { default as VCTemplateEditPage } from "./pages/vc-template-edit";
 export { default as VerifiableCredentialsPage } from "./pages/verifiable-credentials";
 export { default as PresentationDefinitionListPage } from "./pages/presentation-definition-list";
 export { default as PresentationDefinitionEditPage } from "./pages/presentation-definition-edit";
+
+export * from "./hooks/use-get-presentation-definitions";
+export * from "./models/presentation-definition";

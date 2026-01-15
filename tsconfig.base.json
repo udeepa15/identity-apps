@@ -18,9 +18,18 @@
         "target": "es2015",
         "baseUrl": ".",
         "paths": {
-            "@wso2is/dynamic-forms": ["modules/dynamic-forms/src/index.ts"],
-            "@wso2is/form": ["modules/form/src/index.ts"],
-            "@wso2is/forms": ["modules/forms/src/index.ts"],
+            "@wso2is/dynamic-forms": [
+                "modules/dynamic-forms/src/index.ts"
+            ],
+            "@wso2is/form": [
+                "modules/form/src/index.ts"
+            ],
+            "@wso2is/forms": [
+                "modules/forms/src/index.ts"
+            ],
+            "@wso2is/admin.verifiable-credentials.v1": [
+                "features/admin.verifiable-credentials.v1/public-api.ts"
+            ],
             "@wso2is/react-components": [
                 "modules/react-components/src/index.ts"
             ]
