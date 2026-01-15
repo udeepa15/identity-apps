@@ -20,5 +20,6 @@
  * Interface for Verifiable Credentials template endpoints.
  */
 export interface VCTemplateEndpointsInterface {
+    presentationDefinitions: string;
     vcTemplates: string;
 }

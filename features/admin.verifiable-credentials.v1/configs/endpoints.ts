@@ -26,6 +26,7 @@ import { VCTemplateEndpointsInterface } from "../models/endpoints";
  */
 export const getVCTemplateEndpoints = (serverHost: string): VCTemplateEndpointsInterface => {
     return {
+        presentationDefinitions: `${serverHost}/openid4vp/v1/presentation-definitions`,
         vcTemplates: `${serverHost}/api/server/v1/vc-templates`
     };
 };

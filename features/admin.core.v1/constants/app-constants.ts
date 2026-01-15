@@ -155,7 +155,7 @@ export class AppConstants {
      * @returns The app login path.
      */
     public static getAppLoginPath(): string {
-        return window[ "AppUtils" ]?.getConfig()?.routes.login;
+        return window["AppUtils"]?.getConfig()?.routes.login;
     }
 
     /**
@@ -164,7 +164,7 @@ export class AppConstants {
      * @returns The app login path.
      */
     public static getAppLogoutPath(): string {
-        return window[ "AppUtils" ]?.getConfig()?.routes.logout;
+        return window["AppUtils"]?.getConfig()?.routes.logout;
     }
 
     /**
@@ -201,7 +201,7 @@ export class AppConstants {
      */
     public static getMyAccountPath(): string {
 
-        return window[ "AppUtils" ]?.getConfig()?.accountApp.path;
+        return window["AppUtils"]?.getConfig()?.accountApp.path;
     }
 
     /**
@@ -262,119 +262,118 @@ export class AppConstants {
      */
     public static getPaths(): Map<string, string> {
         const paths: Map<string, string> = new Map<string, string>([
-            [ "GETTING_STARTED", `${ AppConstants.getDeveloperViewBasePath() }/getting-started` ],
-            [ "ADMIN_OVERVIEW", `${ AppConstants.getAdminViewBasePath() }/overview` ],
-            [ "ADMIN_ADVISORY_BANNER", `${ AppConstants.getAdminViewBasePath() }/admin-advisory` ],
-            [ "ADMIN_ADVISORY_BANNER_EDIT", `${ AppConstants.getAdminViewBasePath() }/server/admin-advisory` ],
+            ["GETTING_STARTED", `${AppConstants.getDeveloperViewBasePath()}/getting-started`],
+            ["ADMIN_OVERVIEW", `${AppConstants.getAdminViewBasePath()}/overview`],
+            ["ADMIN_ADVISORY_BANNER", `${AppConstants.getAdminViewBasePath()}/admin-advisory`],
+            ["ADMIN_ADVISORY_BANNER_EDIT", `${AppConstants.getAdminViewBasePath()}/server/admin-advisory`],
             [
                 "ANALYTICS",
                 `${AppConstants.getAdminViewBasePath()}/analytics/:categoryId/:connectorId`
             ],
-            [ "API_RESOURCES", `${ AppConstants.getDeveloperViewBasePath() }/api-resources` ],
-            [ "API_RESOURCES_CATEGORY", `${ AppConstants.getDeveloperViewBasePath() }/api-resources/:categoryId` ],
-            [ "API_RESOURCE_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/api-resources/:categoryId/:id` ],
-            [ "APPLICATIONS", `${ AppConstants.getDeveloperViewBasePath() }/applications` ],
-            [ "APPLICATION_TEMPLATES", `${ AppConstants.getDeveloperViewBasePath() }/applications/templates` ],
-            [ "APPLICATION_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/applications/:id` ],
-            [ "APPLICATIONS_SETTINGS", `${ AppConstants.getDeveloperViewBasePath() }/applications-settings` ],
-            [ "APPLICATION_ROLES", `${ AppConstants.getAdminViewBasePath() }/application-roles` ],
-            [ "APPLICATION_ROLES_EDIT",
-                `${ AppConstants.getAdminViewBasePath() }/application-roles/:applicationId/:roleId` ],
-            [ "APPLICATION_ROLES_SUB", `${ AppConstants.getAdminViewBasePath() }/roles/application-roles` ],
-            [ "APPLICATION_ROLES_EDIT_SUB",
-                `${ AppConstants.getAdminViewBasePath() }/roles/application-roles/:applicationId/:roleId` ],
+            ["API_RESOURCES", `${AppConstants.getDeveloperViewBasePath()}/api-resources`],
+            ["API_RESOURCES_CATEGORY", `${AppConstants.getDeveloperViewBasePath()}/api-resources/:categoryId`],
+            ["API_RESOURCE_EDIT", `${AppConstants.getDeveloperViewBasePath()}/api-resources/:categoryId/:id`],
+            ["APPLICATIONS", `${AppConstants.getDeveloperViewBasePath()}/applications`],
+            ["APPLICATION_TEMPLATES", `${AppConstants.getDeveloperViewBasePath()}/applications/templates`],
+            ["APPLICATION_EDIT", `${AppConstants.getDeveloperViewBasePath()}/applications/:id`],
+            ["APPLICATIONS_SETTINGS", `${AppConstants.getDeveloperViewBasePath()}/applications-settings`],
+            ["APPLICATION_ROLES", `${AppConstants.getAdminViewBasePath()}/application-roles`],
+            ["APPLICATION_ROLES_EDIT",
+                `${AppConstants.getAdminViewBasePath()}/application-roles/:applicationId/:roleId`],
+            ["APPLICATION_ROLES_SUB", `${AppConstants.getAdminViewBasePath()}/roles/application-roles`],
+            ["APPLICATION_ROLES_EDIT_SUB",
+                `${AppConstants.getAdminViewBasePath()}/roles/application-roles/:applicationId/:roleId`],
             [
                 "APPLICATION_SIGN_IN_METHOD_EDIT",
-                `${ AppConstants.getDeveloperViewBasePath() }/applications/:id:tabName`
+                `${AppConstants.getDeveloperViewBasePath()}/applications/:id:tabName`
             ],
-            [ "APPROVALS", `${ AppConstants.getAdminViewBasePath() }/approvals` ],
-            [ "APPROVAL_WORKFLOWS",`${ AppConstants.getAdminViewBasePath() }/workflows` ],
-            [ "APPROVAL_WORKFLOW_CREATE",`${ AppConstants.getAdminViewBasePath() }/create-workflow` ],
-            [ "APPROVAL_WORKFLOW_EDIT",`${ AppConstants.getAdminViewBasePath() }/workflows/:id` ],
-            [ "APPROVAL_WORKFLOW_ASSOCIATIONS",`${ AppConstants.getAdminViewBasePath() }/workflow-associations` ],
-            [ "APPROVAL_WORKFLOW_ASSOCIATION_CREATE",
-                `${ AppConstants.getAdminViewBasePath() }/create-workflow-associations` ],
-            [ "APPROVAL_WORKFLOW_ASSOCIATIONS_EDIT",
-                `${ AppConstants.getAdminViewBasePath() }/workflow-associations/:id` ],
-            [ "WORKFLOW_REQUESTS", `${ AppConstants.getAdminViewBasePath() }/workflow-requests` ],
-            [ "BRANDING", `${ AppConstants.getDeveloperViewBasePath() }/branding` ],
-            [ "CERTIFICATES", `${ AppConstants.getAdminViewBasePath() }/certificates` ],
-            [ "CLAIM_DIALECTS", `${ AppConstants.getAdminViewBasePath() }/attributes-and-mappings` ],
-            [ "CLAIM_VERIFICATION_SETTINGS",
-                `${ AppConstants.getAdminViewBasePath() }/attribute-verification-settings`
+            ["APPROVALS", `${AppConstants.getAdminViewBasePath()}/approvals`],
+            ["APPROVAL_WORKFLOWS", `${AppConstants.getAdminViewBasePath()}/workflows`],
+            ["APPROVAL_WORKFLOW_CREATE", `${AppConstants.getAdminViewBasePath()}/create-workflow`],
+            ["APPROVAL_WORKFLOW_EDIT", `${AppConstants.getAdminViewBasePath()}/workflows/:id`],
+            ["APPROVAL_WORKFLOW_ASSOCIATIONS", `${AppConstants.getAdminViewBasePath()}/workflow-associations`],
+            ["APPROVAL_WORKFLOW_ASSOCIATION_CREATE",
+                `${AppConstants.getAdminViewBasePath()}/create-workflow-associations`],
+            ["APPROVAL_WORKFLOW_ASSOCIATIONS_EDIT",
+                `${AppConstants.getAdminViewBasePath()}/workflow-associations/:id`],
+            ["WORKFLOW_REQUESTS", `${AppConstants.getAdminViewBasePath()}/workflow-requests`],
+            ["BRANDING", `${AppConstants.getDeveloperViewBasePath()}/branding`],
+            ["CERTIFICATES", `${AppConstants.getAdminViewBasePath()}/certificates`],
+            ["CLAIM_DIALECTS", `${AppConstants.getAdminViewBasePath()}/attributes-and-mappings`],
+            ["CLAIM_VERIFICATION_SETTINGS",
+                `${AppConstants.getAdminViewBasePath()}/attribute-verification-settings`
             ],
-            [ "CONNECTIONS", `${ AppConstants.getDeveloperViewBasePath() }/connections` ],
-            [ "CONNECTION_TEMPLATES", `${ AppConstants.getDeveloperViewBasePath() }/connections/templates` ],
-            [ "CONNECTION_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/connections/:id` ],
-            [ "CUSTOMIZE", `${ AppConstants.getMainViewBasePath() }/customize` ],
-            [ "DEVELOPER_OVERVIEW", `${ AppConstants.getDeveloperViewBasePath() }/overview` ],
+            ["CONNECTIONS", `${AppConstants.getDeveloperViewBasePath()}/connections`],
+            ["CONNECTION_TEMPLATES", `${AppConstants.getDeveloperViewBasePath()}/connections/templates`],
+            ["CONNECTION_EDIT", `${AppConstants.getDeveloperViewBasePath()}/connections/:id`],
+            ["CUSTOMIZE", `${AppConstants.getMainViewBasePath()}/customize`],
+            ["DEVELOPER_OVERVIEW", `${AppConstants.getDeveloperViewBasePath()}/overview`],
             [
                 "ASSIGN_ORGANIZATION_DISCOVERY_DOMAINS",
                 `${AppConstants.getAdminViewBasePath()}/email-domain-assign`
             ],
-            [ "ORGANIZATION_DISCOVERY_DOMAINS", `${AppConstants.getAdminViewBasePath()}/email-domain-discovery` ],
-            [ "UPDATE_ORGANIZATION_DISCOVERY_DOMAINS", `${AppConstants.getAdminViewBasePath()}/email-domain-edit/:id` ],
-            [ "EMAIL_PROVIDER", `${ AppConstants.getDeveloperViewBasePath() }/email-provider` ],
-            [ "NOTIFICATION_CHANNELS", `${ AppConstants.getDeveloperViewBasePath() }/notification-channels` ],
-            [ "EMAIL_AND_SMS", `${ AppConstants.getDeveloperViewBasePath() }/email-and-sms` ],
-            [ "EMAIL_MANAGEMENT", `${ AppConstants.getDeveloperViewBasePath() }/email-management` ],
-            [ "SMS_PROVIDER", `${ AppConstants.getDeveloperViewBasePath() }/sms-provider` ],
-            [ "SMS_MANAGEMENT", `${ AppConstants.getDeveloperViewBasePath() }/sms-management` ],
-            [ "PUSH_PROVIDER", `${ AppConstants.getDeveloperViewBasePath() }/push-provider` ],
-            [ "FLOWS", `${ AppConstants.getDeveloperViewBasePath() }/flows` ],
-            [ "EMAIL_TEMPLATE_TYPES", `${ AppConstants.getAdminViewBasePath() }/email-templates` ],
-            [ "EMAIL_TEMPLATES", `${ AppConstants.getAdminViewBasePath() }/email-templates/:templateTypeId` ],
+            ["ORGANIZATION_DISCOVERY_DOMAINS", `${AppConstants.getAdminViewBasePath()}/email-domain-discovery`],
+            ["UPDATE_ORGANIZATION_DISCOVERY_DOMAINS", `${AppConstants.getAdminViewBasePath()}/email-domain-edit/:id`],
+            ["EMAIL_PROVIDER", `${AppConstants.getDeveloperViewBasePath()}/email-provider`],
+            ["NOTIFICATION_CHANNELS", `${AppConstants.getDeveloperViewBasePath()}/notification-channels`],
+            ["EMAIL_AND_SMS", `${AppConstants.getDeveloperViewBasePath()}/email-and-sms`],
+            ["EMAIL_MANAGEMENT", `${AppConstants.getDeveloperViewBasePath()}/email-management`],
+            ["SMS_PROVIDER", `${AppConstants.getDeveloperViewBasePath()}/sms-provider`],
+            ["SMS_MANAGEMENT", `${AppConstants.getDeveloperViewBasePath()}/sms-management`],
+            ["PUSH_PROVIDER", `${AppConstants.getDeveloperViewBasePath()}/push-provider`],
+            ["FLOWS", `${AppConstants.getDeveloperViewBasePath()}/flows`],
+            ["EMAIL_TEMPLATE_TYPES", `${AppConstants.getAdminViewBasePath()}/email-templates`],
+            ["EMAIL_TEMPLATES", `${AppConstants.getAdminViewBasePath()}/email-templates/:templateTypeId`],
             [
                 "EMAIL_TEMPLATE",
-                `${ AppConstants.getAdminViewBasePath() }/email-templates/:templateTypeId/:templateId`
+                `${AppConstants.getAdminViewBasePath()}/email-templates/:templateTypeId/:templateId`
             ],
             [
                 "EMAIL_TEMPLATE_ADD",
-                `${ AppConstants.getAdminViewBasePath() }/email-templates/:templateTypeId/${
-                    AppConstants.EMAIL_TEMPLATE_ADD_URL_PARAM }`
+                `${AppConstants.getAdminViewBasePath()}/email-templates/:templateTypeId/${AppConstants.EMAIL_TEMPLATE_ADD_URL_PARAM}`
             ],
-            [ "EXTERNAL_DIALECT_EDIT", `${ AppConstants.getAdminViewBasePath() }/edit-attribute-mappings/:id` ],
-            [ "REGISTRATION_FLOW_BUILDER", `${ AppConstants.getMainViewBasePath() }/edit-self-registration-flow` ],
-            [ "GROUPS", `${ AppConstants.getAdminViewBasePath() }/groups` ],
-            [ "GROUP_EDIT", `${ AppConstants.getAdminViewBasePath() }/groups/:id` ],
-            [ "IDP", `${ AppConstants.getDeveloperViewBasePath() }/connections` ],
-            [ "IDP_TEMPLATES", `${ AppConstants.getDeveloperViewBasePath() }/connections/templates` ],
-            [ "IDP_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/connections/:id` ],
-            [ "AUTH_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/authenticators/:id` ],
-            [ "IDVP", `${ AppConstants.getDeveloperViewBasePath() }/identity-verification-providers` ],
-            [ "IDVP_TEMPLATES",
-                `${ AppConstants.getDeveloperViewBasePath() }/identity-verification-providers/templates`
+            ["EXTERNAL_DIALECT_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-attribute-mappings/:id`],
+            ["REGISTRATION_FLOW_BUILDER", `${AppConstants.getMainViewBasePath()}/edit-self-registration-flow`],
+            ["GROUPS", `${AppConstants.getAdminViewBasePath()}/groups`],
+            ["GROUP_EDIT", `${AppConstants.getAdminViewBasePath()}/groups/:id`],
+            ["IDP", `${AppConstants.getDeveloperViewBasePath()}/connections`],
+            ["IDP_TEMPLATES", `${AppConstants.getDeveloperViewBasePath()}/connections/templates`],
+            ["IDP_EDIT", `${AppConstants.getDeveloperViewBasePath()}/connections/:id`],
+            ["AUTH_EDIT", `${AppConstants.getDeveloperViewBasePath()}/authenticators/:id`],
+            ["IDVP", `${AppConstants.getDeveloperViewBasePath()}/identity-verification-providers`],
+            ["IDVP_TEMPLATES",
+                `${AppConstants.getDeveloperViewBasePath()}/identity-verification-providers/templates`
             ],
-            [ "IDVP_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/identity-verification-providers/:id` ],
-            [ "EVENT_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/event-edit` ],
-            [ "LOCAL_CLAIMS", `${ AppConstants.getAdminViewBasePath() }/attributes` ],
-            [ "LOCAL_CLAIMS_EDIT", `${ AppConstants.getAdminViewBasePath() }/edit-attributes/:id` ],
-            [ "LOGIN", window["AppUtils"]?.getConfig()?.routes.login ],
-            [ "LOGIN_AND_REGISTRATION", `${ AppConstants.getDeveloperViewBasePath() }/login-and-registration` ],
-            [ "ACTIONS", `${ AppConstants.getDeveloperViewBasePath() }/actions` ],
-            [ "WEBHOOKS", `${ AppConstants.getDeveloperViewBasePath() }/webhooks` ],
-            [ "WEBHOOK_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/webhooks/:id` ],
-            [ "SCIM_MAPPING", `${ AppConstants.getAdminViewBasePath() }/attribute-mappings/scim` ],
-            [ "LOGOUT", window["AppUtils"]?.getConfig()?.routes.logout ],
-            [ "OIDC_SCOPES", `${ AppConstants.getAdminViewBasePath() }/oidc-scopes` ],
-            [ "OIDC_SCOPES_EDIT", `${ AppConstants.getAdminViewBasePath() }/oidc-scopes/:id` ],
-            [ "PAGE_NOT_FOUND", `${ AppConstants.getMainViewBasePath() }/404` ],
-            [ "PRIVACY", `${ AppConstants.getMainViewBasePath() }/privacy` ],
-            [ "REMOTE_REPO_CONFIG", `${ AppConstants.getAdminViewBasePath() }/remote-repository-config` ],
-            [ "ROLES", `${ AppConstants.getAdminViewBasePath() }/roles` ],
-            [ "ROLE_CREATE", `${ AppConstants.getAdminViewBasePath() }/create-role` ],
-            [ "ROLE_EDIT", `${ AppConstants.getAdminViewBasePath() }/roles/:id` ],
-            [ "ROOT", "/" ],
-            [ "GOVERNANCE_CONNECTORS", `${AppConstants.getAdminViewBasePath()}/governance-connectors/:id` ],
-            [ "MULTI_ATTRIBUTE_LOGIN", `${AppConstants.getAdminViewBasePath()}/multi-attribute-login` ],
-            [ "UNAUTHORIZED", `${AppConstants.getMainViewBasePath()}/unauthorized` ],
-            [ "USERS", `${AppConstants.getAdminViewBasePath()}/users` ],
-            [ "USER_EDIT", `${AppConstants.getAdminViewBasePath()}/users/:id` ],
-            [ "USERSTORES", `${AppConstants.getAdminViewBasePath()}/user-stores` ],
-            [ "USERSTORES_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-user-store/:id` ],
-            [ "USERSTORE_TEMPLATES", `${AppConstants.getAdminViewBasePath()}/userstore-templates` ],
-            [ "STORING_DATA_DISABLED", `${AppConstants.getMainViewBasePath()}/storing_data_disabled` ],
-            [ "GOVERNANCE_CONNECTOR", `${AppConstants.getAdminViewBasePath()}/connector/:id` ],
+            ["IDVP_EDIT", `${AppConstants.getDeveloperViewBasePath()}/identity-verification-providers/:id`],
+            ["EVENT_EDIT", `${AppConstants.getDeveloperViewBasePath()}/event-edit`],
+            ["LOCAL_CLAIMS", `${AppConstants.getAdminViewBasePath()}/attributes`],
+            ["LOCAL_CLAIMS_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-attributes/:id`],
+            ["LOGIN", window["AppUtils"]?.getConfig()?.routes.login],
+            ["LOGIN_AND_REGISTRATION", `${AppConstants.getDeveloperViewBasePath()}/login-and-registration`],
+            ["ACTIONS", `${AppConstants.getDeveloperViewBasePath()}/actions`],
+            ["WEBHOOKS", `${AppConstants.getDeveloperViewBasePath()}/webhooks`],
+            ["WEBHOOK_EDIT", `${AppConstants.getDeveloperViewBasePath()}/webhooks/:id`],
+            ["SCIM_MAPPING", `${AppConstants.getAdminViewBasePath()}/attribute-mappings/scim`],
+            ["LOGOUT", window["AppUtils"]?.getConfig()?.routes.logout],
+            ["OIDC_SCOPES", `${AppConstants.getAdminViewBasePath()}/oidc-scopes`],
+            ["OIDC_SCOPES_EDIT", `${AppConstants.getAdminViewBasePath()}/oidc-scopes/:id`],
+            ["PAGE_NOT_FOUND", `${AppConstants.getMainViewBasePath()}/404`],
+            ["PRIVACY", `${AppConstants.getMainViewBasePath()}/privacy`],
+            ["REMOTE_REPO_CONFIG", `${AppConstants.getAdminViewBasePath()}/remote-repository-config`],
+            ["ROLES", `${AppConstants.getAdminViewBasePath()}/roles`],
+            ["ROLE_CREATE", `${AppConstants.getAdminViewBasePath()}/create-role`],
+            ["ROLE_EDIT", `${AppConstants.getAdminViewBasePath()}/roles/:id`],
+            ["ROOT", "/"],
+            ["GOVERNANCE_CONNECTORS", `${AppConstants.getAdminViewBasePath()}/governance-connectors/:id`],
+            ["MULTI_ATTRIBUTE_LOGIN", `${AppConstants.getAdminViewBasePath()}/multi-attribute-login`],
+            ["UNAUTHORIZED", `${AppConstants.getMainViewBasePath()}/unauthorized`],
+            ["USERS", `${AppConstants.getAdminViewBasePath()}/users`],
+            ["USER_EDIT", `${AppConstants.getAdminViewBasePath()}/users/:id`],
+            ["USERSTORES", `${AppConstants.getAdminViewBasePath()}/user-stores`],
+            ["USERSTORES_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-user-store/:id`],
+            ["USERSTORE_TEMPLATES", `${AppConstants.getAdminViewBasePath()}/userstore-templates`],
+            ["STORING_DATA_DISABLED", `${AppConstants.getMainViewBasePath()}/storing_data_disabled`],
+            ["GOVERNANCE_CONNECTOR", `${AppConstants.getAdminViewBasePath()}/connector/:id`],
             [
                 "GOVERNANCE_CONNECTOR_EDIT",
                 `${AppConstants.getAdminViewBasePath()}/connector/:categoryId/:connectorId`
@@ -383,78 +382,80 @@ export class AppConstants {
                 "USERNAME_RECOVERY_CONNECTOR_EDIT",
                 `${AppConstants.getAdminViewBasePath()}/connector/:type/:categoryId/:connectorId`
             ],
-            [ "SECRETS", `${AppConstants.getDeveloperViewBasePath()}/secrets` ],
-            [ "SECRET_EDIT", `${AppConstants.getDeveloperViewBasePath()}/secrets/:type/:name` ],
-            [ "SERVER_CONFIG_CATEGORY", `${AppConstants.getAdminViewBasePath()}/login-and-registration/:id` ],
+            ["SECRETS", `${AppConstants.getDeveloperViewBasePath()}/secrets`],
+            ["SECRET_EDIT", `${AppConstants.getDeveloperViewBasePath()}/secrets/:type/:name`],
+            ["SERVER_CONFIG_CATEGORY", `${AppConstants.getAdminViewBasePath()}/login-and-registration/:id`],
             [
                 "ATTRIBUTE_MAPPINGS",
                 `${AppConstants.getAdminViewBasePath()}/attribute-mappings/:type/:customAttributeMappingID?`
             ],
-            [ "CREATE_TENANT", `${AppConstants.getAppBasePath()}/create-tenant` ],
-            [ "ORGANIZATIONS", `${AppConstants.getAdminViewBasePath()}/organizations` ],
-            [ "ORGANIZATION_UPDATE", `${AppConstants.getAdminViewBasePath()}/organizations/:id` ],
-            [ "ORGANIZATION_ROLES", `${AppConstants.getAdminViewBasePath()}/roles/organization-roles` ],
-            [ "ORGANIZATION_ROLE_UPDATE", `${AppConstants.getAdminViewBasePath()}/roles/organization-roles/:id` ],
-            [ "ADMINISTRATORS", `${AppConstants.getAdminViewBasePath()}/administrators` ],
-            [ "ADMINISTRATOR_EDIT", `${AppConstants.getAdminViewBasePath()}/administrators/:id` ],
-            [ "ADMINISTRATOR_SETTINGS", `${AppConstants.getAdminViewBasePath()}/administrator-settings-edit` ],
-            [ "VALIDATION_CONFIG", `${AppConstants.getAdminViewBasePath()}/validation-configuration` ],
-            [ "VALIDATION_CONFIG_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-validation-configuration` ],
-            [ "ACCOUNT_LOGIN", `${AppConstants.getAdminViewBasePath()}/account-login` ],
-            [ "USERNAME_VALIDATION_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-username-validation` ],
-            [ "ALTERNATIVE_LOGIN_IDENTIFIER_EDIT",
-                `${AppConstants.getAdminViewBasePath()}/edit-alternative-login-identifier` ],
-            [ "INSIGHTS", `${AppConstants.getAdminViewBasePath()}/insights` ],
-            [ "REMOTE_LOGGING", `${AppConstants.getAdminViewBasePath()}/server/logs` ],
-            [ "LOGS", `${ AppConstants.getAdminViewBasePath() }/logs` ],
-            [ "LOG_SETTINGS", `${ AppConstants.getAdminViewBasePath() }/log-settings` ],
-            [ "LOG_SETTINGS_AUDIT", `${ AppConstants.getAdminViewBasePath() }/log-settings/audit` ],
-            [ "LOG_SETTINGS_DIAGNOSTICS", `${ AppConstants.getAdminViewBasePath() }/log-settings/diagnostics` ],
-            [ "SESSION_MANAGEMENT",
-                `${AppConstants.getAdminViewBasePath()}/login-and-registration/session-management` ],
-            [ "SAML2_CONFIGURATION",
-                `${AppConstants.getAdminViewBasePath()}/login-and-registration/saml2-configuration` ],
-            [ "CONSOLE_SETTINGS", `${AppConstants.getAdminViewBasePath()}/settings` ],
-            [ "CONSOLE_ADMINISTRATORS_EDIT", `${AppConstants.getAdminViewBasePath()}/settings/administrators/:id` ],
-            [ "CONSOLE_ROLES_EDIT", `${AppConstants.getAdminViewBasePath()}/settings/roles/:id` ],
-            [ "WSFED_CONFIGURATION",
-                `${AppConstants.getAdminViewBasePath()}/login-and-registration/wsfed-configuration` ],
-            [ "INTERNAL_NOTIFICATION_SENDING",
-                `${AppConstants.getAdminViewBasePath()}/login-and-registration/internal-notification-sending` ],
-            [ "ACCOUNT_DISABLE",
-                `${AppConstants.getAdminViewBasePath()}/login-and-registration/account-disable` ],
-            [ "OUTBOUND_PROVISIONING_SETTINGS",
-                `${AppConstants.getAdminViewBasePath()}/outbound-provisioning-settings` ],
-            [ "IMPERSONATION", `${AppConstants.getAdminViewBasePath()}/login-and-registration/impersonation` ],
-            [ "ACTIONS",
-                `${AppConstants.getAdminViewBasePath()}/actions` ],
-            [ "WEBHOOKS",
-                `${AppConstants.getAdminViewBasePath()}/webhooks` ],
-            [ "WEBHOOK_SETTINGS", `${ AppConstants.getDeveloperViewBasePath() }/webhook-settings` ],
-            [ "PRE_ISSUE_ACCESS_TOKEN_EDIT",
-                `${AppConstants.getAdminViewBasePath()}/actions/pre-issue-access-token` ],
-            [ "PRE_ISSUE_ID_TOKEN_EDIT",
-                `${AppConstants.getAdminViewBasePath()}/actions/pre-issue-id-token` ],
-            [ "PRE_UPDATE_PASSWORD_EDIT",
-                `${AppConstants.getAdminViewBasePath()}/actions/pre-update-password` ],
-            [ "PRE_UPDATE_PROFILE_EDIT",
-                `${AppConstants.getAdminViewBasePath()}/actions/pre-update-profile` ],
-            [ "TENANTS", `${AppConstants.getDefaultLayoutBasePath()}/organizations` ],
-            [ "EDIT_TENANT", `${AppConstants.getDefaultLayoutBasePath()}/organizations/:id` ],
-            [ "EDIT_SELF_ORGANIZATION", `${AppConstants.getDefaultLayoutBasePath()}/organizations/self` ],
-            [ "SYSTEM_SETTINGS", `${AppConstants.getDefaultLayoutBasePath()}/organizations/system-settings` ],
-            [ "POLICY_ADMINISTRATION", `${AppConstants.getAdminViewBasePath()}/policy-administration` ],
-            [ "EDIT_POLICY", `${AppConstants.getAdminViewBasePath()}/policy-administration/edit-policy/:id` ],
-            [ "MCP_SERVERS", `${ AppConstants.getDeveloperViewBasePath() }/mcp-servers` ],
-            [ "MCP_SERVER_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/mcp-servers/:id` ],
-            [ "PASSWORD_RECOVERY_FLOW_BUILDER",
-                `${ AppConstants.getDeveloperViewBasePath() }/edit-password-recovery-flow` ],
-            [ "INVITE_USER_PASSWORD_SETUP_FLOW_BUILDER",
-                `${ AppConstants.getDeveloperViewBasePath() }/edit-invited-user-registration-flow` ],
-            [ "AGENTS", `${AppConstants.getAdminViewBasePath()}/agents` ],
-            [ "AGENT_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/agents/:id` ],
-            [ "VC_TEMPLATES", `${AppConstants.getAdminViewBasePath()}/verifiable-credentials` ],
-            [ "VC_TEMPLATE_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/verifiable-credentials/:id` ]
+            ["CREATE_TENANT", `${AppConstants.getAppBasePath()}/create-tenant`],
+            ["ORGANIZATIONS", `${AppConstants.getAdminViewBasePath()}/organizations`],
+            ["ORGANIZATION_UPDATE", `${AppConstants.getAdminViewBasePath()}/organizations/:id`],
+            ["ORGANIZATION_ROLES", `${AppConstants.getAdminViewBasePath()}/roles/organization-roles`],
+            ["ORGANIZATION_ROLE_UPDATE", `${AppConstants.getAdminViewBasePath()}/roles/organization-roles/:id`],
+            ["ADMINISTRATORS", `${AppConstants.getAdminViewBasePath()}/administrators`],
+            ["ADMINISTRATOR_EDIT", `${AppConstants.getAdminViewBasePath()}/administrators/:id`],
+            ["ADMINISTRATOR_SETTINGS", `${AppConstants.getAdminViewBasePath()}/administrator-settings-edit`],
+            ["VALIDATION_CONFIG", `${AppConstants.getAdminViewBasePath()}/validation-configuration`],
+            ["VALIDATION_CONFIG_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-validation-configuration`],
+            ["ACCOUNT_LOGIN", `${AppConstants.getAdminViewBasePath()}/account-login`],
+            ["USERNAME_VALIDATION_EDIT", `${AppConstants.getAdminViewBasePath()}/edit-username-validation`],
+            ["ALTERNATIVE_LOGIN_IDENTIFIER_EDIT",
+                `${AppConstants.getAdminViewBasePath()}/edit-alternative-login-identifier`],
+            ["INSIGHTS", `${AppConstants.getAdminViewBasePath()}/insights`],
+            ["REMOTE_LOGGING", `${AppConstants.getAdminViewBasePath()}/server/logs`],
+            ["LOGS", `${AppConstants.getAdminViewBasePath()}/logs`],
+            ["LOG_SETTINGS", `${AppConstants.getAdminViewBasePath()}/log-settings`],
+            ["LOG_SETTINGS_AUDIT", `${AppConstants.getAdminViewBasePath()}/log-settings/audit`],
+            ["LOG_SETTINGS_DIAGNOSTICS", `${AppConstants.getAdminViewBasePath()}/log-settings/diagnostics`],
+            ["SESSION_MANAGEMENT",
+                `${AppConstants.getAdminViewBasePath()}/login-and-registration/session-management`],
+            ["SAML2_CONFIGURATION",
+                `${AppConstants.getAdminViewBasePath()}/login-and-registration/saml2-configuration`],
+            ["CONSOLE_SETTINGS", `${AppConstants.getAdminViewBasePath()}/settings`],
+            ["CONSOLE_ADMINISTRATORS_EDIT", `${AppConstants.getAdminViewBasePath()}/settings/administrators/:id`],
+            ["CONSOLE_ROLES_EDIT", `${AppConstants.getAdminViewBasePath()}/settings/roles/:id`],
+            ["WSFED_CONFIGURATION",
+                `${AppConstants.getAdminViewBasePath()}/login-and-registration/wsfed-configuration`],
+            ["INTERNAL_NOTIFICATION_SENDING",
+                `${AppConstants.getAdminViewBasePath()}/login-and-registration/internal-notification-sending`],
+            ["ACCOUNT_DISABLE",
+                `${AppConstants.getAdminViewBasePath()}/login-and-registration/account-disable`],
+            ["OUTBOUND_PROVISIONING_SETTINGS",
+                `${AppConstants.getAdminViewBasePath()}/outbound-provisioning-settings`],
+            ["IMPERSONATION", `${AppConstants.getAdminViewBasePath()}/login-and-registration/impersonation`],
+            ["ACTIONS",
+                `${AppConstants.getAdminViewBasePath()}/actions`],
+            ["WEBHOOKS",
+                `${AppConstants.getAdminViewBasePath()}/webhooks`],
+            ["WEBHOOK_SETTINGS", `${AppConstants.getDeveloperViewBasePath()}/webhook-settings`],
+            ["PRE_ISSUE_ACCESS_TOKEN_EDIT",
+                `${AppConstants.getAdminViewBasePath()}/actions/pre-issue-access-token`],
+            ["PRE_ISSUE_ID_TOKEN_EDIT",
+                `${AppConstants.getAdminViewBasePath()}/actions/pre-issue-id-token`],
+            ["PRE_UPDATE_PASSWORD_EDIT",
+                `${AppConstants.getAdminViewBasePath()}/actions/pre-update-password`],
+            ["PRE_UPDATE_PROFILE_EDIT",
+                `${AppConstants.getAdminViewBasePath()}/actions/pre-update-profile`],
+            ["TENANTS", `${AppConstants.getDefaultLayoutBasePath()}/organizations`],
+            ["EDIT_TENANT", `${AppConstants.getDefaultLayoutBasePath()}/organizations/:id`],
+            ["EDIT_SELF_ORGANIZATION", `${AppConstants.getDefaultLayoutBasePath()}/organizations/self`],
+            ["SYSTEM_SETTINGS", `${AppConstants.getDefaultLayoutBasePath()}/organizations/system-settings`],
+            ["POLICY_ADMINISTRATION", `${AppConstants.getAdminViewBasePath()}/policy-administration`],
+            ["EDIT_POLICY", `${AppConstants.getAdminViewBasePath()}/policy-administration/edit-policy/:id`],
+            ["MCP_SERVERS", `${AppConstants.getDeveloperViewBasePath()}/mcp-servers`],
+            ["MCP_SERVER_EDIT", `${AppConstants.getDeveloperViewBasePath()}/mcp-servers/:id`],
+            ["PASSWORD_RECOVERY_FLOW_BUILDER",
+                `${AppConstants.getDeveloperViewBasePath()}/edit-password-recovery-flow`],
+            ["INVITE_USER_PASSWORD_SETUP_FLOW_BUILDER",
+                `${AppConstants.getDeveloperViewBasePath()}/edit-invited-user-registration-flow`],
+            ["AGENTS", `${AppConstants.getAdminViewBasePath()}/agents`],
+            ["AGENT_EDIT", `${AppConstants.getDeveloperViewBasePath()}/agents/:id`],
+            ["VC_TEMPLATES", `${AppConstants.getAdminViewBasePath()}/verifiable-credentials`],
+            ["VC_TEMPLATE_EDIT", `${AppConstants.getDeveloperViewBasePath()}/verifiable-credentials/:id`],
+            ["PRESENTATION_DEFINITIONS", `${AppConstants.getAdminViewBasePath()}/verifiable-credentials/presentation-definitions`],
+            ["PRESENTATION_DEFINITION_EDIT", `${AppConstants.getDeveloperViewBasePath()}/verifiable-credentials/presentation-definitions/:id`]
         ]);
 
         return paths;
@@ -469,7 +470,7 @@ export class AppConstants {
      */
     public static filterGoverananceConnectors(
         governanceConnectorCategories: GovernanceConnectorCategoryInterface[]
-    ) : GovernanceConnectorCategoryInterface[] {
+    ): GovernanceConnectorCategoryInterface[] {
         const showGovernanceConnectorsIdOfSuborgs: string[] = [];
 
         GovernanceConnectorUtils.SHOW_GOVERNANCE_CONNECTORS_FOR_SUBORGS
@@ -477,12 +478,12 @@ export class AppConstants {
                 showGovernanceConnectorsIdOfSuborgs.push(connector.id);
             });
 
-        for (let index: number = governanceConnectorCategories.length-1; index >=0 ; index--) {
+        for (let index: number = governanceConnectorCategories.length - 1; index >= 0; index--) {
 
             const connector: GovernanceConnectorCategoryInterface = governanceConnectorCategories[index];
 
-            if(!showGovernanceConnectorsIdOfSuborgs.includes(connector.id)) {
-                governanceConnectorCategories.splice(index,1);
+            if (!showGovernanceConnectorsIdOfSuborgs.includes(connector.id)) {
+                governanceConnectorCategories.splice(index, 1);
             }
         }
 
@@ -503,9 +504,9 @@ export class AppConstants {
      * Set of login errors to be used as search params to toggle unauthorized page appearance.
      */
     public static readonly LOGIN_ERRORS: Map<string, string> = new Map<string, string>([
-        [ "NO_LOGIN_PERMISSION", "no_login_permission" ],
-        [ "ACCESS_DENIED", "access_denied" ],
-        [ "USER_DENIED_CONSENT", "consent_denied" ]
+        ["NO_LOGIN_PERMISSION", "no_login_permission"],
+        ["ACCESS_DENIED", "access_denied"],
+        ["USER_DENIED_CONSENT", "consent_denied"]
     ]);
 
     /**
@@ -558,7 +559,7 @@ export class AppConstants {
      */
     public static readonly ORGANIZATION_ONLY_ROUTES: string[] = [
         "roles",
-        ...(this.getAdministratorsFeatureConfig()?.enabled ? [ "consoleSettings" ] : [])
+        ...(this.getAdministratorsFeatureConfig()?.enabled ? ["consoleSettings"] : [])
     ];
 
     /**
