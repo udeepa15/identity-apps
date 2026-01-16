@@ -208,3 +208,124 @@ export const deletePresentationDefinition = (id: string): Promise<AxiosResponse>
             return Promise.reject(error);
         });
 };
+
+/**
+ * Get application presentation definition mapping.
+ *
+ * @param applicationId - The ID of the application.
+ * @returns Promise with the mapping.
+ */
+export const getApplicationPresentationDefinitionMapping = (
+    applicationId: string
+): Promise<{ applicationId: string; presentationDefinitionId: string }> => {
+    const requestConfig: RequestConfigInterface = {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: HttpMethods.GET,
+        url: `${store.getState().config.endpoints.presentationDefinitions}/mapping/${applicationId}`
+    };
+
+    console.log(`GET /presentation-definitions/mapping/${applicationId}: Fetching mapping`);
+
+    return httpClient(requestConfig)
+        .then((response: AxiosResponse) => {
+            console.log(`GET /presentation-definitions/mapping/${applicationId}: Success`, response?.data);
+
+            return Promise.resolve(response?.data);
+        })
+        .catch((error: AxiosError) => {
+            // 404 is expected when no mapping exists
+            if (error?.response?.status === 404) {
+                console.log(`GET /presentation-definitions/mapping/${applicationId}: No mapping found (404)`);
+
+                return Promise.resolve(null);
+            }
+
+            console.error(`GET /presentation-definitions/mapping/${applicationId}: Error`, {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
+            return Promise.reject(error);
+        });
+};
+
+/**
+ * Create or update application presentation definition mapping.
+ *
+ * @param applicationId - The ID of the application.
+ * @param presentationDefinitionId - The ID of the presentation definition.
+ * @returns Promise with the response.
+ */
+export const createOrUpdateApplicationPresentationDefinitionMapping = (
+    applicationId: string,
+    presentationDefinitionId: string
+): Promise<AxiosResponse> => {
+    const requestConfig: RequestConfigInterface = {
+        data: {
+            applicationId,
+            presentationDefinitionId
+        },
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: HttpMethods.POST,
+        url: `${store.getState().config.endpoints.presentationDefinitions}/mapping`
+    };
+
+    console.log(`POST /presentation-definitions/mapping: Creating/updating mapping for ${applicationId}`);
+
+    return httpClient(requestConfig)
+        .then((response: AxiosResponse) => {
+            console.log(`POST /presentation-definitions/mapping: Success`, response?.data);
+
+            return Promise.resolve(response);
+        })
+        .catch((error: AxiosError) => {
+            console.error(`POST /presentation-definitions/mapping: Error`, {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
+            return Promise.reject(error);
+        });
+};
+
+/**
+ * Delete application presentation definition mapping.
+ *
+ * @param applicationId - The ID of the application.
+ * @returns Promise with the response.
+ */
+export const deleteApplicationPresentationDefinitionMapping = (
+    applicationId: string
+): Promise<AxiosResponse> => {
+    const requestConfig: RequestConfigInterface = {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: HttpMethods.DELETE,
+        url: `${store.getState().config.endpoints.presentationDefinitions}/mapping/${applicationId}`
+    };
+
+    console.log(`DELETE /presentation-definitions/mapping/${applicationId}: Deleting mapping`);
+
+    return httpClient(requestConfig)
+        .then((response: AxiosResponse) => {
+            console.log(`DELETE /presentation-definitions/mapping/${applicationId}: Success`);
+
+            return Promise.resolve(response);
+        })
+        .catch((error: AxiosError) => {
+            console.error(`DELETE /presentation-definitions/mapping/${applicationId}: Error`, {
+                data: error?.response?.data,
+                message: error?.message,
+                status: error?.response?.status
+            });
+
+            return Promise.reject(error);
+        });
+};

@@ -23,3 +23,4 @@ export { default as PresentationDefinitionEditPage } from "./pages/presentation-
 
 export * from "./hooks/use-get-presentation-definitions";
 export * from "./models/presentation-definition";
+export * from "./api/presentation-definition";
