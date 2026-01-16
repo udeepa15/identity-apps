@@ -223,57 +223,93 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
      *
      * @param values - Form values.
      */
+    /**
+     * Handle form submit.
+     *
+     * @param values - Form values.
+     */
     const handleFormSubmit = (values: any): void => {
         setIsSubmitting(true);
 
-        // When using uncontrolledForm={true}, values is a plain object, not a Map
         const selectedPresentationDefinitionId = values.presentationDefinitionId || "";
 
-        const updatedAuthSequence = updateAuthenticatorProperty(
-            application.authenticationSequence,
-            "PresentationDefinitionId",
-            selectedPresentationDefinitionId
-        );
+        // Find which step contains the OpenID4VP authenticator
+        let openIDVPStepIndex = 1; // Default to 1
+        let found = false;
 
-        // Sanitize the authentication sequence to remove unnecessary fields
-        // The API only expects strictly defined fields in the update payload
-        const sanitizedSteps = updatedAuthSequence.steps?.map((step: AuthenticationStepInterface) => {
+        // Helper map to store step-specific configs
+        const stepSpecificConfigs: { [key: number]: any } = {};
+
+        if (application.authenticationSequence?.steps) {
+            application.authenticationSequence.steps.forEach((step: AuthenticationStepInterface) => {
+                if (found) return;
+                const hasOpenIDVP = step.options?.some(
+                    (opt: AuthenticatorInterface) => opt.authenticator === OPENID4VP_AUTHENTICATOR_NAME
+                );
+                if (hasOpenIDVP) {
+                    openIDVPStepIndex = step.id;
+                    found = true;
+                }
+            });
+        }
+
+        // Generate Adaptive Auth Script
+        // We use a script because the API does not support configuring local authenticator properties 
+        // directly in the step options payload.
+        const adaptiveScript = `
+var onLoginRequest = function(context) {
+    executeStep(${openIDVPStepIndex}, {
+        authenticatorParams: {
+            local: {
+                OpenID4VPAuthenticator: {
+                    PresentationDefinitionId: "${selectedPresentationDefinitionId}"
+                }
+            }
+        }
+    }, {});
+};`;
+
+        // Sanitize steps: strictly REMOVE properties from options to avoid "Unexpected format" API error
+        const sanitizedSteps = application.authenticationSequence.steps?.map((step: AuthenticationStepInterface) => {
             return {
                 id: step.id,
                 options: step.options?.map((option: any) => {
-                    const sanitizedOption: any = {
+                    // Return strictly minimal option object
+                    return {
                         authenticator: option.authenticator,
                         idp: option.idp
                     };
-
-                    // Only include properties if they exist and are not empty
-                    if (option.properties && option.properties.length > 0) {
-                        sanitizedOption.properties = option.properties;
-                    }
-
-                    return sanitizedOption;
                 })
             };
         });
 
-        // Construct the authentication sequence with only allowed fields
         const payloadAuthenticationSequence = {
-            attributeStepId: updatedAuthSequence.attributeStepId,
-            requestPathAuthenticators: updatedAuthSequence.requestPathAuthenticators,
-            script: updatedAuthSequence.script,
+            attributeStepId: application.authenticationSequence.attributeStepId,
+            requestPathAuthenticators: application.authenticationSequence.requestPathAuthenticators || [],
+            script: adaptiveScript, // Set the script
             steps: sanitizedSteps,
-            subjectStepId: updatedAuthSequence.subjectStepId,
-            type: updatedAuthSequence.type
+            subjectStepId: application.authenticationSequence.subjectStepId,
+            type: application.authenticationSequence.type || "USER_DEFINED"
         };
+
+        // Remove script if it is explicitly undefined in our logic (though we just set it above)
+        // But for safety, cleaner payload
+        if (!payloadAuthenticationSequence.script) {
+            delete payloadAuthenticationSequence.script;
+        }
 
         const updatedApplication = {
             id: application.id,
             authenticationSequence: payloadAuthenticationSequence
         };
 
+        console.log("handleFormSubmit: Generating Adaptive Script", { adaptiveScript });
+        console.log("handleFormSubmit: Debugging payload (JSON)", JSON.stringify(updatedApplication, null, 2));
+
         // Cast to unknown then ApplicationInterface to bypass strict type checking for partial updates
         updateApplicationDetails(updatedApplication as unknown as ApplicationInterface)
             .then(() => {
+                console.log("handleFormSubmit: Update successful");
                 dispatch(addAlert({
                     description: t("applications:notifications.updateApplication.success.description"),
                     level: AlertLevels.SUCCESS,
@@ -282,6 +318,18 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
                 onUpdate(application.id);
             })
             .catch((error: any) => {
+                console.error("handleFormSubmit: Update failed", error);
+
+                let errorDetails = "Unknown Error";
+                if (error?.response?.data) {
+                    try {
+                        errorDetails = JSON.stringify(error.response.data, null, 2);
+                    } catch (e) {
+                        errorDetails = error.response.data;
+                    }
+                }
+                console.error("handleFormSubmit: API Error Response Body:", errorDetails);
+
                 dispatch(addAlert({
                     description: error?.response?.data?.description ||
                         t("applications:notifications.updateApplication.error.description"),
