@@ -288,11 +288,11 @@ module.exports = (config: WebpackOptionsNormalized, context: NxWebpackContextInt
                 hash: true,
                 importIdentityTenantUtil: !isDeployedOnExternalTomcatServer
                     ? "<%@ page import=\"" +
-                "static org.wso2.carbon.identity.core.util.IdentityTenantUtil.isTenantQualifiedUrlsEnabled\" %>"
+                    "static org.wso2.carbon.identity.core.util.IdentityTenantUtil.isTenantQualifiedUrlsEnabled\" %>"
                     : "",
                 importIsSuperTenantRequiredInUrl: !isDeployedOnExternalTomcatServer
                     ? "<%@ page import=\"" +
-                "static org.wso2.carbon.identity.core.util.IdentityTenantUtil.isSuperTenantRequiredInUrl\" %>"
+                    "static org.wso2.carbon.identity.core.util.IdentityTenantUtil.isSuperTenantRequiredInUrl\" %>"
                     : "",
                 importOwaspEncode: "<%@ page import=\"org.owasp.encoder.Encode\" %>",
                 importSuperTenantConstant: !isDeployedOnExternalTomcatServer
@@ -444,7 +444,7 @@ module.exports = (config: WebpackOptionsNormalized, context: NxWebpackContextInt
             cacheLocation: ABSOLUTE_PATHS.eslintCache,
             context: ABSOLUTE_PATHS.appSrc,
             eslintPath: require.resolve("eslint"),
-            extensions: [ "js", "jsx", "ts", "tsx" ],
+            extensions: ["js", "jsx", "ts", "tsx"],
             lintDirtyModulesOnly: true,
             overrideConfigFile: ABSOLUTE_PATHS.eslintrc
         }) as unknown) as WebpackPluginInstance
@@ -499,7 +499,7 @@ module.exports = (config: WebpackOptionsNormalized, context: NxWebpackContextInt
             new CopyWebpackPlugin({
                 ...existingCopyPlugin,
                 patterns: [
-                    ...existingCopyPlugin[ "patterns" ]
+                    ...existingCopyPlugin["patterns"]
                         .map((pattern: any) => {
                             if (isDeployedOnExternalStaticServer) {
                                 // For deployments on static servers, we don't require `auth.jsp`
@@ -617,15 +617,15 @@ module.exports = (config: WebpackOptionsNormalized, context: NxWebpackContextInt
 
     config.module.rules.push({
         test: /\.md$/,
-        use: [ "raw-loader" ]
+        use: ["raw-loader"]
     });
 
     config.module.rules.forEach((rule: RuleSetRule) => {
         if (rule.type?.includes("asset") && rule.test instanceof RegExp && rule.test.toString().includes("png")) {
             rule.generator = {
                 filename: isProduction
-                    ? `${ RELATIVE_PATHS.staticMedia }/[hash][ext][query]`
-                    : `${ RELATIVE_PATHS.staticMedia }/[path][name][ext]`
+                    ? `${RELATIVE_PATHS.staticMedia}/[hash][ext][query]`
+                    : `${RELATIVE_PATHS.staticMedia}/[path][name][ext]`
             };
         }
 
@@ -646,11 +646,11 @@ module.exports = (config: WebpackOptionsNormalized, context: NxWebpackContextInt
     config.output = {
         ...config.output,
         chunkFilename: isProduction
-            ? `${ RELATIVE_PATHS.staticJs }/[name].[contenthash:8].chunk.js`
-            : `${ RELATIVE_PATHS.staticJs }/[name].chunk.js`,
+            ? `${RELATIVE_PATHS.staticJs}/[name].[contenthash:8].chunk.js`
+            : `${RELATIVE_PATHS.staticJs}/[name].chunk.js`,
         filename: isProduction
-            ? `${ RELATIVE_PATHS.staticJs }/[name].[contenthash:8].js`
-            : `${ RELATIVE_PATHS.staticJs }/[name].js`,
+            ? `${RELATIVE_PATHS.staticJs}/[name].[contenthash:8].js`
+            : `${RELATIVE_PATHS.staticJs}/[name].js`,
         hotUpdateChunkFilename: "hot/[id].[fullhash].hot-update.js",
         hotUpdateMainFilename: "hot/[runtime].[fullhash].hot-update.json",
         path: (isPreAuthCheckEnabled && process.env.APP_BASE_PATH) ?
@@ -821,7 +821,7 @@ const getThemeConfigs = (theme: string) => {
     const file: string = ltrFiles.length > 0 ? ltrFiles[0] : null;
 
     return {
-        styleSheetHash: file ? file.split(".")[ 1 ] : null
+        styleSheetHash: file ? file.split(".")[1] : null
     };
 };
 
@@ -836,10 +836,10 @@ const getI18nConfigs = () => {
         // Log Infastructure Error.
     }
 
-    const metaFile: string = metaFiles ? metaFiles.filter((file: string) => file.startsWith("meta"))[ 0 ] : null;
+    const metaFile: string = metaFiles ? metaFiles.filter((file: string) => file.startsWith("meta"))[0] : null;
 
     return {
-        metaFileHash: metaFile ? metaFile.split(".")[ 1 ] : null
+        metaFileHash: metaFile ? metaFile.split(".")[1] : null
     };
 };
 
@@ -858,7 +858,7 @@ const getRelativePaths = (env: Configuration["mode"], context: NxWebpackContextI
         distribution: path.join("build", "console"),
         homeTemplate,
         indexTemplate: context.buildOptions?.index ?? context.options.index,
-        javaEEFolders: [ "**/WEB-INF/**/*" ],
+        javaEEFolders: ["**/WEB-INF/**/*"],
         loginPortalLayoutsInDistribution: path.join("libs", "login-portal-layouts"),
         source: "src",
         staticJs: path.join("static", "js"),

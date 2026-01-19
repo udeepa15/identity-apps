@@ -279,21 +279,27 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
             )
             : deleteApplicationPresentationDefinitionMapping(application.id);
 
+        console.log("handleFormSubmit: API Call initiated", {
+            action: selectedPresentationDefinitionId ? "create/update" : "delete",
+            appId: application.id,
+            defId: selectedPresentationDefinitionId
+        });
+
         mappingPromise
             .then(() => {
                 console.log("handleFormSubmit: Mapping update successful");
-                
+
                 // Find the definition name from the list
                 const selectedDefinition = presentationDefinitions?.find(
                     (def: PresentationDefinitionInterface) => def.definitionId === selectedPresentationDefinitionId
                 );
-                
+
                 const definitionName = selectedDefinition?.name || selectedPresentationDefinitionId;
-                
+
                 // Update local state
                 setPresentationDefinitionId(selectedPresentationDefinitionId);
                 setCurrentMappedDefinitionName(definitionName);
-                
+
                 // Show success message with the definition name
                 if (selectedPresentationDefinitionId) {
                     dispatch(addAlert({
@@ -309,7 +315,7 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
                     }));
                     setCurrentMappedDefinitionName("");
                 }
-                
+
                 // Trigger parent update callback
                 onUpdate(application.id);
             })
@@ -325,6 +331,12 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
                     }
                 }
                 console.error("handleFormSubmit: API Error Response Body:", errorDetails);
+                console.error("handleFormSubmit: Full Error Object:", error);
+
+                if (error?.response) {
+                    console.error("handleFormSubmit: Response Status:", error.response.status);
+                    console.error("handleFormSubmit: Response Headers:", error.response.headers);
+                }
 
                 dispatch(addAlert({
                     description: error?.response?.data?.description ||
