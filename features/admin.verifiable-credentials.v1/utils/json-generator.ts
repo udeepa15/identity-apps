@@ -133,14 +133,26 @@ function buildFieldsArray(cred: CredentialRequirement): FieldConstraint[] {
     });
 
     // 2. Issuer constraint (if specified)
-    if (cred.issuerDid) {
-        fields.push({
-            path: getIssuerPath(cred.format),
-            filter: {
-                type: "string",
-                const: cred.issuerDid
-            }
-        });
+    if (cred.issuerDids && cred.issuerDids.length > 0) {
+        if (cred.issuerDids.length === 1) {
+            // Single issuer - use const
+            fields.push({
+                path: getIssuerPath(cred.format),
+                filter: {
+                    type: "string",
+                    const: cred.issuerDids[0]
+                }
+            });
+        } else {
+            // Multiple issuers - use enum
+            fields.push({
+                path: getIssuerPath(cred.format),
+                filter: {
+                    type: "string",
+                    enum: cred.issuerDids
+                }
+            });
+        }
     }
 
     // 3. Claim constraints

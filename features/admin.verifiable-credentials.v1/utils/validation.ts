@@ -115,11 +115,15 @@ export function validateCredentialRequirement(
     }
 
     // V005: Issuer DID validation (if provided)
-    if (cred.issuerDid && !isValidDid(cred.issuerDid)) {
-        errors.push({
-            field: `${prefix}.issuerDid`,
-            message: "Invalid DID format. Expected: did:method:identifier",
-            severity: "error"
+    if (cred.issuerDids && cred.issuerDids.length > 0) {
+        cred.issuerDids.forEach((did, didIndex) => {
+            if (!isValidDid(did)) {
+                errors.push({
+                    field: `${prefix}.issuerDids[${didIndex}]`,
+                    message: `Invalid DID format: "${did}". Expected: did:method:identifier`,
+                    severity: "error"
+                });
+            }
         });
     }
 
@@ -203,7 +207,7 @@ export function getErrorsForStep(
             return errors.filter(e =>
                 e.field.includes(".format") ||
                 e.field.includes(".proofAlgorithm") ||
-                e.field.includes(".issuerDid")
+                e.field.includes(".issuerDids")
             );
         case 3: // Constraints
             return errors.filter(e =>

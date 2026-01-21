@@ -18,8 +18,8 @@
 
 import { IdentifiableComponentInterface } from "@wso2is/core/models";
 import { Hint, Message, PrimaryButton } from "@wso2is/react-components";
-import React, { FunctionComponent, ReactElement, useCallback } from "react";
-import { Button, Card, Form, Grid, Icon, Input } from "semantic-ui-react";
+import React, { FunctionComponent, ReactElement, useCallback, useState } from "react";
+import { Button, Card, Form, Grid, Icon, Input, Label } from "semantic-ui-react";
 import { COMMON_CREDENTIAL_TYPES } from "../../../constants/presentation-definition-constants";
 import {
     createCredentialRequirement,
@@ -50,6 +50,9 @@ const CredentialRequirementsStep: FunctionComponent<CredentialRequirementsStepPr
     errors,
     "data-componentid": componentId = "credential-requirements-step"
 }: CredentialRequirementsStepProps): ReactElement => {
+
+    // Track new issuer DID input for each credential
+    const [newIssuerInputs, setNewIssuerInputs] = useState<Record<string, string>>({});
 
     /**
      * Adds a new credential requirement.
@@ -114,6 +117,38 @@ const CredentialRequirementsStep: FunctionComponent<CredentialRequirementsStepPr
             credentialType: type,
             name: type || "New Credential",
             id: `${id}_${Math.random().toString(36).substring(2, 7)}`
+        });
+    };
+
+    /**
+     * Adds an issuer DID to a credential.
+     */
+    const addIssuerDid = (credentialId: string, index: number) => {
+        const newDid = newIssuerInputs[credentialId]?.trim();
+        if (!newDid) return;
+
+        const credential = formData.credentials[index];
+        const currentDids = credential.issuerDids || [];
+
+        // Don't add duplicates
+        if (currentDids.includes(newDid)) return;
+
+        updateCredential(index, {
+            issuerDids: [...currentDids, newDid]
+        });
+
+        // Clear input
+        setNewIssuerInputs(prev => ({ ...prev, [credentialId]: "" }));
+    };
+
+    /**
+     * Removes an issuer DID from a credential.
+     */
+    const removeIssuerDid = (index: number, didToRemove: string) => {
+        const credential = formData.credentials[index];
+        const filtered = (credential.issuerDids || []).filter(did => did !== didToRemove);
+        updateCredential(index, {
+            issuerDids: filtered.length > 0 ? filtered : undefined
         });
     };
 
@@ -231,6 +266,69 @@ const CredentialRequirementsStep: FunctionComponent<CredentialRequirementsStepPr
                                             />
                                             <Hint compact>
                                                 Override the global purpose text for this specific credential.
+                                            </Hint>
+                                        </Form.Field>
+                                    </Grid.Column>
+                                </Grid.Row>
+
+                                {/* Trusted Issuer DIDs */}
+                                <Grid.Row columns={1}>
+                                    <Grid.Column>
+                                        <Form.Field>
+                                            <label>
+                                                <Icon name="shield" />
+                                                Trusted Issuer DIDs (Optional)
+                                            </label>
+
+                                            {/* Display current issuer DIDs as labels */}
+                                            {credential.issuerDids && credential.issuerDids.length > 0 && (
+                                                <div style={{ marginBottom: "10px" }}>
+                                                    {credential.issuerDids.map((did) => (
+                                                        <Label
+                                                            key={did}
+                                                            style={{ margin: "2px" }}
+                                                        >
+                                                            <Icon name="key" />
+                                                            {did.length > 50 ? `${did.substring(0, 50)}...` : did}
+                                                            <Icon
+                                                                name="delete"
+                                                                onClick={() => removeIssuerDid(index, did)}
+                                                                style={{ cursor: "pointer" }}
+                                                            />
+                                                        </Label>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Add new issuer DID input */}
+                                            <div style={{ display: "flex", gap: "8px" }}>
+                                                <Input
+                                                    style={{ flex: 1 }}
+                                                    placeholder="did:web:example.com or did:key:z6Mk..."
+                                                    value={newIssuerInputs[credential.id] || ""}
+                                                    onChange={(e) => setNewIssuerInputs(prev => ({
+                                                        ...prev,
+                                                        [credential.id]: e.target.value
+                                                    }))}
+                                                    onKeyDown={(e: React.KeyboardEvent) => {
+                                                        if (e.key === "Enter") {
+                                                            e.preventDefault();
+                                                            addIssuerDid(credential.id, index);
+                                                        }
+                                                    }}
+                                                    data-componentid={`${componentId}-issuer-input-${index}`}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    primary
+                                                    onClick={() => addIssuerDid(credential.id, index)}
+                                                    data-componentid={`${componentId}-add-issuer-${index}`}
+                                                >
+                                                    <Icon name="add" /> Add Issuer
+                                                </Button>
+                                            </div>
+                                            <Hint compact>
+                                                Only accept credentials from these issuers. Leave empty to accept any issuer.
                                             </Hint>
                                         </Form.Field>
                                     </Grid.Column>

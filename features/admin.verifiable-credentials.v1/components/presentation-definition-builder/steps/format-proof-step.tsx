@@ -175,7 +175,7 @@ const FormatProofStep: FunctionComponent<FormatProofStepProps> = ({
                                 </Grid.Row>
 
                                 {/* Proof Algorithm Selection */}
-                                <Grid.Row columns={2}>
+                                <Grid.Row columns={1}>
                                     <Grid.Column>
                                         <Form.Field error={!!getCredentialError(index, "proofAlgorithm")}>
                                             <label>Proof Algorithm</label>
@@ -198,30 +198,6 @@ const FormatProofStep: FunctionComponent<FormatProofStepProps> = ({
                                             )}
                                             <Hint compact>
                                                 Select the signature algorithm for verification.
-                                            </Hint>
-                                        </Form.Field>
-                                    </Grid.Column>
-
-                                    {/* Issuer DID Filter (Optional) */}
-                                    <Grid.Column>
-                                        <Form.Field error={!!getCredentialError(index, "issuerDid")}>
-                                            <label>Issuer DID (Optional)</label>
-                                            <Input
-                                                placeholder="did:web:issuer.example.com"
-                                                value={credential.issuerDid || ""}
-                                                onChange={(e) => updateCredential(index, {
-                                                    issuerDid: e.target.value || undefined
-                                                })}
-                                                data-componentid={`${componentId}-issuer-${index}`}
-                                            />
-                                            {getCredentialError(index, "issuerDid") && (
-                                                <Message
-                                                    type="error"
-                                                    content={getCredentialError(index, "issuerDid")}
-                                                />
-                                            )}
-                                            <Hint compact>
-                                                Only accept credentials from this specific issuer.
                                             </Hint>
                                         </Form.Field>
                                     </Grid.Column>

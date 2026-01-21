@@ -50,8 +50,8 @@ export interface CredentialRequirement {
     format: VCFormat;
     /** Proof/signature algorithm */
     proofAlgorithm: ProofAlgorithm;
-    /** Optional issuer DID filter */
-    issuerDid?: string;
+    /** Optional issuer DID filters (trusted issuers) */
+    issuerDids?: string[];
     /** Claim-level constraints */
     claimConstraints: ClaimConstraint[];
 }
