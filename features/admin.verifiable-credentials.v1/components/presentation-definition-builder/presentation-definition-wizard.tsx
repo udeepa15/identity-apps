@@ -45,7 +45,7 @@ interface PresentationDefinitionWizardProps extends IdentifiableComponentInterfa
     /** Callback when wizard is cancelled */
     onCancel: () => void;
     /** Callback when wizard is submitted with generated JSON */
-    onSubmit: (name: string, description: string, json: string) => void;
+    onSubmit: (name: string, description: string, json: string, didMethod: string, signingAlgorithm: string) => void;
     /** Whether submission is in progress */
     isSubmitting?: boolean;
 }
@@ -133,7 +133,13 @@ const PresentationDefinitionWizard: FunctionComponent<PresentationDefinitionWiza
 
         if (!hasBlockingErrors(allErrors)) {
             const jsonString = generatePresentationDefinitionString(formData);
-            onSubmit(formData.name, formData.description || "", jsonString);
+            onSubmit(
+                formData.name,
+                formData.description || "",
+                jsonString,
+                formData.didMethod || "web",
+                formData.signingAlgorithm || "RS256"
+            );
         }
     }, [formData, onSubmit]);
 

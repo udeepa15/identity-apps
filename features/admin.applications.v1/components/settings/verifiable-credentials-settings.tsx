@@ -32,11 +32,9 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { Divider, Grid } from "semantic-ui-react";
-import { updateApplicationDetails } from "../../api/application";
 import {
     ApplicationInterface,
     AuthenticationSequenceInterface,
-    AuthenticationStepInterface,
     AuthenticatorInterface
 } from "../../models/application";
 
@@ -80,12 +78,11 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
     const { t } = useTranslation();
     const dispatch: Dispatch = useDispatch();
 
+    // State variables
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [presentationDefinitionId, setPresentationDefinitionId] = useState<string>("");
     const [isLoadingMapping, setIsLoadingMapping] = useState<boolean>(true);
     const [currentMappedDefinitionName, setCurrentMappedDefinitionName] = useState<string>("");
-
-    console.log("VerifiableCredentialsSettings: Component rendering", { application });
 
     const {
         data: presentationDefinitions,
@@ -93,78 +90,8 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
         error: presentationDefinitionsError
     } = useGetPresentationDefinitions();
 
-    console.log("VerifiableCredentialsSettings: Hook data", {
-        presentationDefinitions,
-        isPresentationDefinitionsLoading,
-        presentationDefinitionsError
-    });
-
-    /**
-     * Load application-specific presentation definition mapping.
-     */
-    useEffect(() => {
-        if (!application?.id) {
-            return;
-        }
-
-        setIsLoadingMapping(true);
-
-        console.log("VerifiableCredentialsSettings: Loading mapping for app", { applicationId: application.id });
-
-        getApplicationPresentationDefinitionMapping(application.id)
-            .then((mapping) => {
-                if (mapping?.presentationDefinitionId) {
-                    console.log("VerifiableCredentialsSettings: Found app-specific mapping", { mapping });
-                    setPresentationDefinitionId(mapping.presentationDefinitionId);
-                } else {
-                    console.log("VerifiableCredentialsSettings: No app-specific mapping, checking authenticator config");
-                    // Fall back to checking authenticator configuration
-                    const openid4vpAuthenticator = findOpenID4VPAuthenticator(application.authenticationSequence);
-                    if (openid4vpAuthenticator) {
-                        const presentationDefId = getAuthenticatorProperty(
-                            openid4vpAuthenticator,
-                            "PresentationDefinitionId"
-                        );
-                        console.log("VerifiableCredentialsSettings: Found in authenticator config", { presentationDefId });
-                        setPresentationDefinitionId(presentationDefId || "");
-                    }
-                }
-            })
-            .catch((error) => {
-                console.error("VerifiableCredentialsSettings: Error loading mapping", error);
-                // Fall back to checking authenticator configuration
-                const openid4vpAuthenticator = findOpenID4VPAuthenticator(application.authenticationSequence);
-                if (openid4vpAuthenticator) {
-                    const presentationDefId = getAuthenticatorProperty(
-                        openid4vpAuthenticator,
-                        "PresentationDefinitionId"
-                    );
-                    setPresentationDefinitionId(presentationDefId || "");
-                }
-            })
-            .finally(() => {
-                setIsLoadingMapping(false);
-            });
-    }, [application?.id]);
-
-    /**
-     * Extract the presentation definition ID from the authentication sequence.
-     */
-    useEffect(() => {
-        console.log("VerifiableCredentialsSettings: useEffect triggered", {
-            hasAuthSequence: !!application?.authenticationSequence,
-            hasSteps: !!application?.authenticationSequence?.steps
-        });
-
-        // This useEffect is now deprecated - mapping is loaded in the previous useEffect
-        // Keeping it for backward compatibility in case mapping API fails
-    }, [application]);
-
     /**
      * Find the OpenID4VP authenticator in the authentication sequence.
-     *
-     * @param authSequence - Authentication sequence.
-     * @returns OpenID4VP authenticator or undefined.
      */
     const findOpenID4VPAuthenticator = (authSequence: AuthenticationSequenceInterface): any => {
         if (!authSequence?.steps) {
@@ -186,10 +113,6 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
 
     /**
      * Get a property value from the authenticator.
-     *
-     * @param authenticator - Authenticator object.
-     * @param propertyName - Property name.
-     * @returns Property value or undefined.
      */
     const getAuthenticatorProperty = (authenticator: any, propertyName: string): string | undefined => {
         if (!authenticator?.properties) {
@@ -202,76 +125,53 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
     };
 
     /**
-     * Update the authenticator property in the authentication sequence.
-     *
-     * @param authSequence - Authentication sequence.
-     * @param propertyName - Property name.
-     * @param propertyValue - Property value.
-     * @returns Updated authentication sequence.
+     * Load application-specific presentation definition mapping.
      */
-    const updateAuthenticatorProperty = (
-        authSequence: AuthenticationSequenceInterface,
-        propertyName: string,
-        propertyValue: string
-    ): AuthenticationSequenceInterface => {
-        if (!authSequence?.steps) {
-            return authSequence;
+    useEffect(() => {
+        if (!application?.id) {
+            return;
         }
 
-        const updatedSteps = authSequence.steps.map((step: AuthenticationStepInterface) => {
-            const updatedOptions = step.options?.map((option: any) => {
-                if (option.authenticator === OPENID4VP_AUTHENTICATOR_NAME) {
-                    const properties = option.properties || [];
-                    const existingPropertyIndex = properties.findIndex(
-                        (prop: any) => prop.name === propertyName
-                    );
+        setIsLoadingMapping(true);
 
-                    if (existingPropertyIndex >= 0) {
-                        properties[existingPropertyIndex].value = propertyValue;
-                    } else {
-                        properties.push({
-                            name: propertyName,
-                            value: propertyValue
-                        });
+        getApplicationPresentationDefinitionMapping(application.id)
+            .then((mapping) => {
+                if (mapping?.presentationDefinitionId) {
+                    setPresentationDefinitionId(mapping.presentationDefinitionId);
+                } else {
+                    const openid4vpAuthenticator = findOpenID4VPAuthenticator(application.authenticationSequence);
+                    if (openid4vpAuthenticator) {
+                        const presentationDefId = getAuthenticatorProperty(
+                            openid4vpAuthenticator,
+                            "PresentationDefinitionId"
+                        );
+                        setPresentationDefinitionId(presentationDefId || "");
                     }
-
-                    return {
-                        ...option,
-                        properties
-                    };
                 }
-
-                return option;
+            })
+            .catch(() => {
+                const openid4vpAuthenticator = findOpenID4VPAuthenticator(application.authenticationSequence);
+                if (openid4vpAuthenticator) {
+                    const presentationDefId = getAuthenticatorProperty(
+                        openid4vpAuthenticator,
+                        "PresentationDefinitionId"
+                    );
+                    setPresentationDefinitionId(presentationDefId || "");
+                }
+            })
+            .finally(() => {
+                setIsLoadingMapping(false);
             });
-
-            return {
-                ...step,
-                options: updatedOptions
-            };
-        });
-
-        return {
-            ...authSequence,
-            steps: updatedSteps
-        };
-    };
+    }, [application?.id]);
 
     /**
      * Handle form submit.
-     *
-     * @param values - Form values.
      */
     const handleFormSubmit = (values: any): void => {
         setIsSubmitting(true);
 
         const selectedPresentationDefinitionId = values.presentationDefinitionId || "";
 
-        console.log("handleFormSubmit: Using per-application mapping", {
-            applicationId: application.id,
-            presentationDefinitionId: selectedPresentationDefinitionId
-        });
-
-        // Use the new per-application mapping API
         const mappingPromise = selectedPresentationDefinitionId
             ? createOrUpdateApplicationPresentationDefinitionMapping(
                 application.id,
@@ -279,69 +179,34 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
             )
             : deleteApplicationPresentationDefinitionMapping(application.id);
 
-        console.log("handleFormSubmit: API Call initiated", {
-            action: selectedPresentationDefinitionId ? "create/update" : "delete",
-            appId: application.id,
-            defId: selectedPresentationDefinitionId
-        });
-
         mappingPromise
             .then(() => {
-                console.log("handleFormSubmit: Mapping update successful");
-
-                // Find the definition name from the list
                 const selectedDefinition = presentationDefinitions?.find(
                     (def: PresentationDefinitionInterface) => def.definitionId === selectedPresentationDefinitionId
                 );
 
                 const definitionName = selectedDefinition?.name || selectedPresentationDefinitionId;
 
-                // Update local state
                 setPresentationDefinitionId(selectedPresentationDefinitionId);
                 setCurrentMappedDefinitionName(definitionName);
 
-                // Show success message with the definition name
-                if (selectedPresentationDefinitionId) {
-                    dispatch(addAlert({
-                        description: `Presentation definition "${definitionName}" has been successfully mapped to this application.`,
-                        level: AlertLevels.SUCCESS,
-                        message: t("applications:notifications.updateApplication.success.message")
-                    }));
-                } else {
-                    dispatch(addAlert({
-                        description: "Presentation definition mapping has been removed. Application will use default or authenticator configuration.",
-                        level: AlertLevels.SUCCESS,
-                        message: t("applications:notifications.updateApplication.success.message")
-                    }));
-                    setCurrentMappedDefinitionName("");
-                }
+                dispatch(addAlert({
+                    description: selectedPresentationDefinitionId
+                        ? `Presentation definition "${definitionName}" has been mapped to this application.`
+                        : "Presentation definition mapping has been removed.",
+                    level: AlertLevels.SUCCESS,
+                    message: t("applications:notifications.updateApplication.success.message")
+                }));
 
-                // Trigger parent update callback
                 onUpdate(application.id);
             })
             .catch((error: any) => {
-                console.error("handleFormSubmit: Mapping update failed", error);
-
-                let errorDetails = "Unknown Error";
-                if (error?.response?.data) {
-                    try {
-                        errorDetails = JSON.stringify(error.response.data, null, 2);
-                    } catch (e) {
-                        errorDetails = error.response.data;
-                    }
-                }
-                console.error("handleFormSubmit: API Error Response Body:", errorDetails);
-                console.error("handleFormSubmit: Full Error Object:", error);
-
-                if (error?.response) {
-                    console.error("handleFormSubmit: Response Status:", error.response.status);
-                    console.error("handleFormSubmit: Response Headers:", error.response.headers);
-                }
+                const errorDescription = error?.response?.data?.description ||
+                    error?.response?.data?.error_description ||
+                    t("applications:notifications.updateApplication.error.description");
 
                 dispatch(addAlert({
-                    description: error?.response?.data?.description ||
-                        error?.response?.data?.error_description ||
-                        t("applications:notifications.updateApplication.error.description"),
+                    description: errorDescription,
                     level: AlertLevels.ERROR,
                     message: t("applications:notifications.updateApplication.error.message")
                 }));
@@ -365,9 +230,6 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
         });
     }, [presentationDefinitions]);
 
-    /**
-     * Get the current mapped definition name.
-     */
     const getCurrentMappedDefinitionDisplay = (): string => {
         if (!presentationDefinitionId) {
             return "No presentation definition configured";
@@ -377,18 +239,12 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
             return currentMappedDefinitionName;
         }
 
-        // Find from definitions list
         const definition = presentationDefinitions?.find(
             (def: PresentationDefinitionInterface) => def.definitionId === presentationDefinitionId
         );
 
         return definition?.name || presentationDefinitionId;
     };
-
-    console.log("VerifiableCredentialsSettings: Rendering UI", {
-        presentationDefinitionOptions,
-        presentationDefinitionId
-    });
 
     if (presentationDefinitionsError) {
         return (
@@ -420,7 +276,6 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
                     </Grid.Row>
                 </Grid>
 
-                {/* Current Mapping Status */}
                 {!isLoadingMapping && (
                     <Grid>
                         <Grid.Row columns={1}>
@@ -465,6 +320,10 @@ export const VerifiableCredentialsSettings: FunctionComponent<VerifiableCredenti
                                     readOnly={readOnly}
                                     data-componentid={`${componentId}-presentation-definition-dropdown`}
                                 />
+                                <Hint>
+                                    Presentation definitions can be created and configured in the
+                                    Verifiable Credentials section, including DID method settings.
+                                </Hint>
                             </Grid.Column>
                         </Grid.Row>
                         <Grid.Row columns={1}>

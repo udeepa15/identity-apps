@@ -217,8 +217,24 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
     /**
      * Handles submission from builder wizard.
      */
-    const handleWizardSubmit = useCallback((name: string, description: string, json: string) => {
-        submitDefinition(name, description, json);
+    const handleWizardSubmit = useCallback((
+        name: string,
+        description: string,
+        json: string,
+        didMethod: string,
+        signingAlgorithm: string
+    ) => {
+        try {
+            const parsed = JSON.parse(json);
+            // Inject internal configuration for DID method and algorithm
+            parsed._internal = {
+                did_method: didMethod,
+                signing_algorithm: signingAlgorithm
+            };
+            submitDefinition(name, description, JSON.stringify(parsed, null, 2));
+        } catch (e) {
+            submitDefinition(name, description, json);
+        }
     }, [submitDefinition]);
 
     /**

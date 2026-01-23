@@ -37,6 +37,10 @@ export interface PresentationDefinitionInterface {
      */
     definitionJson: string;
     /**
+     * DID method for the verifier (web, key, jwk).
+     */
+    didMethod?: string;
+    /**
      * Whether this is the default definition.
      */
     isDefault?: boolean;

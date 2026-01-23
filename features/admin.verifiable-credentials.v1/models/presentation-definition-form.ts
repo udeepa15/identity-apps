@@ -67,6 +67,10 @@ export interface PresentationDefinitionFormData {
     description?: string;
     /** Global purpose text (used if not overridden per credential) */
     purpose: string;
+    /** DID method for the verifier identity (web, key, jwk) */
+    didMethod: string;
+    /** Signing algorithm for the request object (EdDSA, ES256, RS256) */
+    signingAlgorithm: string;
     /** List of credential requirements */
     credentials: CredentialRequirement[];
 }
@@ -119,6 +123,8 @@ export const DEFAULT_FORM_DATA: PresentationDefinitionFormData = {
     name: "",
     description: "",
     purpose: "Please share the requested credentials to proceed.",
+    didMethod: "web",
+    signingAlgorithm: "RS256", // Default for did:web
     credentials: []
 };
 

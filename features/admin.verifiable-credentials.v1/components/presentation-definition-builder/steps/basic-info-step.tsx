@@ -133,6 +133,67 @@ const BasicInfoStep: FunctionComponent<BasicInfoStepProps> = ({
                         </Grid.Column>
                     </Grid.Row>
 
+                    {/* DID Method Field */}
+                    <Grid.Row columns={1}>
+                        <Grid.Column mobile={16} tablet={16} computer={10}>
+                            <Field.Dropdown
+                                ariaLabel="DID Method"
+                                name="didMethod"
+                                label="Issuer DID Method"
+                                required={true}
+                                value={formData.didMethod || "web"}
+                                options={[
+                                    { key: "web", text: "did:web (Web-based DID)", value: "web" },
+                                    { key: "key", text: "did:key (Key-based DID)", value: "key" },
+                                    { key: "jwk", text: "did:jwk (JWK-based DID)", value: "jwk" }
+                                ]}
+                                onChange={(e: any, { value }: { value: string }) => {
+                                    const newMethod = value;
+                                    let newAlgo = formData.signingAlgorithm;
+
+                                    // Reset algo if invalid for new method (did:key supports only EdDSA/EC)
+                                    if (newMethod === "key" && newAlgo === "RS256") {
+                                        newAlgo = "EdDSA";
+                                    }
+
+                                    onChange({ didMethod: newMethod, signingAlgorithm: newAlgo });
+                                }}
+                                data-componentid={`${componentId}-did-method-dropdown`}
+                            />
+                            <Hint>
+                                Select the DID method for the verifier identity. This determines how
+                                the Request Object is signed and how the verifier is identified.
+                            </Hint>
+                        </Grid.Column>
+                    </Grid.Row>
+
+                    {/* Signing Algorithm Field */}
+                    <Grid.Row columns={1}>
+                        <Grid.Column mobile={16} tablet={16} computer={10}>
+                            <Field.Dropdown
+                                ariaLabel="Signing Algorithm"
+                                name="signingAlgorithm"
+                                label="Signing Algorithm"
+                                required={true}
+                                value={formData.signingAlgorithm || "RS256"}
+                                options={[
+                                    { key: "EdDSA", text: "EdDSA (Ed25519)", value: "EdDSA" },
+                                    { key: "ES256", text: "ES256 (P-256)", value: "ES256" },
+                                    // RSA is only available for did:web and did:jwk
+                                    ...((formData.didMethod !== "key") ? [{ key: "RS256", text: "RS256 (RSA)", value: "RS256" }] : [])
+                                ]}
+                                onChange={(e: any, { value }: { value: string }) => {
+                                    onChange({ signingAlgorithm: value });
+                                }}
+                                data-componentid={`${componentId}-signing-algorithm-dropdown`}
+                            />
+                            <Hint>
+                                Select the cryptographic algorithm for signing the request object.
+                                Note: did:key only supports EdDSA and ES256.
+                            </Hint>
+                        </Grid.Column>
+                    </Grid.Row>
+
                     {/* Description Field (Optional) */}
                     <Grid.Row columns={1}>
                         <Grid.Column mobile={16} tablet={16} computer={10}>
