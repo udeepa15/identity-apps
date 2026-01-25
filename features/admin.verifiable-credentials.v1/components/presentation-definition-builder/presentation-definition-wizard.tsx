@@ -46,6 +46,8 @@ interface PresentationDefinitionWizardProps extends IdentifiableComponentInterfa
     onCancel: () => void;
     /** Callback when wizard is submitted with generated JSON */
     onSubmit: (name: string, description: string, json: string, didMethod: string, signingAlgorithm: string) => void;
+    /** Text for the submit button (default: "Create Definition") */
+    submitButtonText?: string;
     /** Whether submission is in progress */
     isSubmitting?: boolean;
 }
@@ -57,6 +59,7 @@ const PresentationDefinitionWizard: FunctionComponent<PresentationDefinitionWiza
     initialData,
     onCancel,
     onSubmit,
+    submitButtonText = "Create Definition",
     isSubmitting = false,
     "data-componentid": componentId = "presentation-definition-wizard"
 }: PresentationDefinitionWizardProps): ReactElement => {
@@ -299,7 +302,7 @@ const PresentationDefinitionWizard: FunctionComponent<PresentationDefinitionWiza
                                     data-componentid={`${componentId}-submit-button`}
                                 >
                                     <Icon name="check" />
-                                    Create Definition
+                                    {submitButtonText}
                                 </Button>
                             )}
                         </Grid.Column>

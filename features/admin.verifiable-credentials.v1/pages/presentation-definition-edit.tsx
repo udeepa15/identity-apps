@@ -43,6 +43,7 @@ import {
 import { PresentationDefinitionWizard } from "../components/presentation-definition-builder";
 import { useGetPresentationDefinition } from "../hooks/use-get-presentation-definition";
 import { PresentationDefinitionInterface } from "../models/presentation-definition";
+import { mapDefinitionToFormData } from "../utils/form-mapper";
 
 type EditorMode = "builder" | "json";
 
@@ -81,13 +82,21 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
         mutate: mutateDefinition
     } = useGetPresentationDefinition(definitionId, !isNew && !!definitionId);
 
+    // FIX: Map definition to form data for Wizard
+    const initialFormData = React.useMemo(() => {
+        if (definition) {
+            // Lazy import or assuming imported function
+            return mapDefinitionToFormData(definition);
+        }
+        return undefined;
+    }, [definition]);
+
     useEffect(() => {
         if (definition) {
             setDefinitionJson(definition.definitionJson);
-            // For existing definitions, default to JSON mode
-            setEditorMode("json");
+            // FIX: Default to Builder mode for better UX
+            setEditorMode("builder");
         } else if (isNew) {
-            // For new definitions, default to builder mode
             setEditorMode("builder");
             setDefinitionJson(JSON.stringify({
                 "id": `definition-${Math.random().toString(36).substring(2, 9)}`,
@@ -301,9 +310,11 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
      */
     const renderBuilderMode = (): ReactElement => (
         <PresentationDefinitionWizard
+            initialData={initialFormData}
             onCancel={handleWizardCancel}
             onSubmit={handleWizardSubmit}
             isSubmitting={isSubmitting}
+            submitButtonText={isNew ? "Create Definition" : "Update Definition"}
             data-componentid={`${componentId}-wizard`}
         />
     );
