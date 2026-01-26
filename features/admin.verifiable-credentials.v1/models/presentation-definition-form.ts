@@ -44,6 +44,8 @@ export interface CredentialRequirement {
     name: string;
     /** VC type (e.g., "IdentityCredential") */
     credentialType: string;
+    /** Match mode for VC Type: "exact" | "pattern" */
+    typeMatchMode?: "exact" | "pattern";
     /** Purpose text for this specific credential */
     purpose?: string;
     /** VC format */
@@ -110,9 +112,14 @@ export const DEFAULT_CLAIM_CONSTRAINT: Partial<ClaimConstraint> = {
 /**
  * Default values for a new credential requirement.
  */
-export const DEFAULT_CREDENTIAL_REQUIREMENT: Partial<CredentialRequirement> = {
+export const DEFAULT_CREDENTIAL_REQUIREMENT: CredentialRequirement = {
+    id: "",
+    name: "",
+    purpose: "",
+    credentialType: "",
+    typeMatchMode: "exact",
     format: VCFormat.JWT_VC_JSON,
-    proofAlgorithm: ProofAlgorithm.EDDSA,
+    proofAlgorithm: ProofAlgorithm.RS256,
     claimConstraints: []
 };
 

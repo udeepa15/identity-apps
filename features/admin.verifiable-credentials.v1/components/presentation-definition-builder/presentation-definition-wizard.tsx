@@ -77,11 +77,16 @@ const PresentationDefinitionWizard: FunctionComponent<PresentationDefinitionWiza
     // Validation state
     const [errors, setErrors] = useState<ValidationError[]>([]);
 
+    // Manual JSON edit state
+    const [editedJson, setEditedJson] = useState<string | null>(null);
+
     /**
      * Updates form data and clears related errors.
+     * Resets manually edited JSON if form data changes.
      */
     const updateFormData = useCallback((updates: Partial<PresentationDefinitionFormData>) => {
         setFormData(prev => ({ ...prev, ...updates }));
+        setEditedJson(null);
     }, []);
 
     /**
@@ -135,29 +140,47 @@ const PresentationDefinitionWizard: FunctionComponent<PresentationDefinitionWiza
         setErrors(allErrors);
 
         if (!hasBlockingErrors(allErrors)) {
-            const jsonString = generatePresentationDefinitionString(formData);
+            const jsonString = editedJson ?? generatePresentationDefinitionString(formData);
+
+            let finalName = formData.name;
+            let finalDesc = formData.description || "";
+            let finalDidMethod = formData.didMethod || "web";
+            let finalSigningAlg = formData.signingAlgorithm || "RS256";
+
+            // If user manually edited JSON, ensure top-level metadata matches the JSON
+            if (editedJson) {
+                try {
+                    const parsed = JSON.parse(editedJson);
+                    if (parsed.name) finalName = parsed.name;
+                    if (parsed.description !== undefined) finalDesc = parsed.description;
+
+                    // Also respect internal config edits if present
+                    if (parsed._internal?.did_method) {
+                        finalDidMethod = parsed._internal.did_method;
+                    }
+                    if (parsed._internal?.signing_algorithm) {
+                        finalSigningAlg = parsed._internal.signing_algorithm;
+                    }
+                } catch (e) {
+                    // If JSON is invalid, we rely on formData for metadata but send the invalid JSON string
+                    // The backend or parent component will handle the parse error for the JSON itself
+                }
+            }
+
             onSubmit(
-                formData.name,
-                formData.description || "",
+                finalName,
+                finalDesc,
                 jsonString,
-                formData.didMethod || "web",
-                formData.signingAlgorithm || "RS256"
+                finalDidMethod,
+                finalSigningAlg
             );
         }
-    }, [formData, onSubmit]);
+    }, [formData, onSubmit, editedJson]);
+
+    // ... (goToStep remains same)
 
     /**
-     * Navigates to a specific step (from step indicator).
-     */
-    const goToStep = useCallback((step: number) => {
-        // Only allow navigation to completed steps or adjacent step
-        if (completedSteps.has(step) || step === currentStep + 1 || step < currentStep) {
-            setCurrentStep(step);
-        }
-    }, [completedSteps, currentStep]);
-
-    /**
-     * Generated JSON for preview.
+     * Generated JSON for preview (or edited version).
      */
     const generatedJson = useMemo(() => {
         try {
@@ -166,6 +189,13 @@ const PresentationDefinitionWizard: FunctionComponent<PresentationDefinitionWiza
             return "// Error generating JSON";
         }
     }, [formData]);
+
+    /**
+     * Handles JSON changes in preview.
+     */
+    const handleJsonChange = useCallback((json: string) => {
+        setEditedJson(json);
+    }, []);
 
     /**
      * Renders the current step content.
@@ -212,7 +242,8 @@ const PresentationDefinitionWizard: FunctionComponent<PresentationDefinitionWiza
                 return (
                     <PreviewStep
                         formData={formData}
-                        generatedJson={generatedJson}
+                        generatedJson={editedJson ?? generatedJson}
+                        onChange={handleJsonChange}
                         errors={errors}
                         data-componentid={`${componentId}-preview-step`}
                     />

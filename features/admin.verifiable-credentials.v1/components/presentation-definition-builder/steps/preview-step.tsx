@@ -30,6 +30,8 @@ interface PreviewStepProps extends IdentifiableComponentInterface {
     formData: PresentationDefinitionFormData;
     /** Generated JSON string */
     generatedJson: string;
+    /** Callback when JSON is manually edited */
+    onChange: (json: string) => void;
     /** Validation errors */
     errors: ValidationError[];
 }
@@ -41,6 +43,7 @@ interface PreviewStepProps extends IdentifiableComponentInterface {
 const PreviewStep: FunctionComponent<PreviewStepProps> = ({
     formData,
     generatedJson,
+    onChange,
     errors,
     "data-componentid": componentId = "preview-step"
 }: PreviewStepProps): ReactElement => {
@@ -168,12 +171,16 @@ const PreviewStep: FunctionComponent<PreviewStepProps> = ({
 
                 <div style={{ border: "1px solid #ccc", marginTop: "1rem" }}>
                     <CodeEditor
+                        lint
                         language="json"
                         sourceCode={generatedJson}
-                        readOnly={true}
+                        readOnly={false}
                         options={{
                             lineWrapping: true,
                             lineNumbers: true
+                        }}
+                        onChange={(editor: any, data: any, value: string) => {
+                            onChange(value);
                         }}
                         height="400px"
                         theme="light"

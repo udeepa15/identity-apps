@@ -199,10 +199,20 @@ const CredentialRequirementsStep: FunctionComponent<CredentialRequirementsStepPr
                                 <Grid.Row columns={1}>
                                     <Grid.Column>
                                         <Form.Field required error={!!getCredentialError(index, "credentialType")}>
-                                            <label>Credential Type</label>
+                                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
+                                                <label>Credential Type</label>
+                                                <Form.Checkbox
+                                                    label="Use Regex Pattern"
+                                                    checked={credential.typeMatchMode === "pattern"}
+                                                    onChange={(e, { checked }) => updateCredential(index, {
+                                                        typeMatchMode: checked ? "pattern" : "exact"
+                                                    })}
+                                                    data-componentid={`${componentId}-pattern-mode-${index}`}
+                                                />
+                                            </div>
                                             <Input
                                                 list={`${componentId}-type-options-${index}`}
-                                                placeholder="e.g., IdentityCredential"
+                                                placeholder={credential.typeMatchMode === "pattern" ? "e.g., ^Life.*Credential$" : "e.g., IdentityCredential"}
                                                 value={credential.credentialType}
                                                 onChange={(e) => handleTypeChange(index, e.target.value)}
                                                 data-componentid={`${componentId}-type-input-${index}`}
@@ -219,7 +229,10 @@ const CredentialRequirementsStep: FunctionComponent<CredentialRequirementsStepPr
                                                 />
                                             )}
                                             <Hint compact>
-                                                The VC type to request (e.g., IdentityCredential, DriverLicenseCredential)
+                                                {credential.typeMatchMode === "pattern"
+                                                    ? "Enter a regex pattern to match the credential type (e.g. Identity.*)"
+                                                    : "The exact VC type to request (e.g., IdentityCredential)"
+                                                }
                                             </Hint>
                                         </Form.Field>
                                     </Grid.Column>

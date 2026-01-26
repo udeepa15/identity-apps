@@ -119,10 +119,18 @@ function mapInputDescriptorToCredential(descriptor: any): CredentialRequirement 
 
             // A. VC Type Constraint
             if (paths.some((p: string) => p.includes("type"))) {
-                if (filter && filter.contains && filter.contains.const) {
-                    cred.credentialType = filter.contains.const;
+                if (filter && filter.contains) {
+                    if (filter.contains.const) {
+                        cred.credentialType = filter.contains.const;
+                        cred.typeMatchMode = "exact";
+                    } else if (filter.contains.pattern) {
+                        cred.credentialType = filter.contains.pattern;
+                        cred.typeMatchMode = "pattern";
+                    }
                 } else if (filter && filter.pattern) {
+                    // Fallback for direct pattern (if array structure is different)
                     cred.credentialType = filter.pattern;
+                    cred.typeMatchMode = "pattern";
                 }
                 return;
             }

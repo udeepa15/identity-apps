@@ -124,12 +124,18 @@ function buildFieldsArray(cred: CredentialRequirement): FieldConstraint[] {
     const fields: FieldConstraint[] = [];
 
     // 1. VC Type constraint (always added)
+    // 1. VC Type constraint (always added)
+    const typeFilter: any = { type: "array" };
+
+    if (cred.typeMatchMode === "pattern") {
+        typeFilter.contains = { pattern: cred.credentialType };
+    } else {
+        typeFilter.contains = { const: cred.credentialType };
+    }
+
     fields.push({
         path: getTypePath(cred.format),
-        filter: {
-            type: "array",
-            contains: { const: cred.credentialType }
-        }
+        filter: typeFilter
     });
 
     // 2. Issuer constraint (if specified)

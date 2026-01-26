@@ -20,21 +20,16 @@ import { AppConstants } from "@wso2is/admin.core.v1/constants/app-constants";
 import { history } from "@wso2is/admin.core.v1/helpers/history";
 import { AlertInterface, AlertLevels, IdentifiableComponentInterface } from "@wso2is/core/models";
 import { addAlert } from "@wso2is/core/store";
-import { Field, Form } from "@wso2is/form";
 import {
-    CodeEditor,
     ContentLoader,
     DangerZone,
     DangerZoneGroup,
-    EmphasizedSegment,
-    PageLayout,
-    PrimaryButton
+    PageLayout
 } from "@wso2is/react-components";
 import React, { FunctionComponent, ReactElement, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { Button, Grid, Icon, Menu, Message } from "semantic-ui-react";
 import {
     createPresentationDefinition,
     deletePresentationDefinition,
@@ -45,12 +40,10 @@ import { useGetPresentationDefinition } from "../hooks/use-get-presentation-defi
 import { PresentationDefinitionInterface } from "../models/presentation-definition";
 import { mapDefinitionToFormData } from "../utils/form-mapper";
 
-type EditorMode = "builder" | "json";
-
 type PresentationDefinitionEditPageProps = IdentifiableComponentInterface;
 
 /**
- * Presentation Definition Edit page with Builder and JSON modes.
+ * Presentation Definition Edit page with Builder mode.
  *
  * @param props - Props injected to the component.
  * @returns React element.
@@ -63,8 +56,6 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
 
     const [definitionId, setDefinitionId] = useState<string>(undefined);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [definitionJson, setDefinitionJson] = useState<string>("");
-    const [editorMode, setEditorMode] = useState<EditorMode>("builder");
 
     const isNew: boolean = definitionId === "new";
 
@@ -82,47 +73,13 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
         mutate: mutateDefinition
     } = useGetPresentationDefinition(definitionId, !isNew && !!definitionId);
 
-    // FIX: Map definition to form data for Wizard
+    // Map definition to form data for Wizard
     const initialFormData = React.useMemo(() => {
         if (definition) {
-            // Lazy import or assuming imported function
             return mapDefinitionToFormData(definition);
         }
         return undefined;
     }, [definition]);
-
-    useEffect(() => {
-        if (definition) {
-            setDefinitionJson(definition.definitionJson);
-            // FIX: Default to Builder mode for better UX
-            setEditorMode("builder");
-        } else if (isNew) {
-            setEditorMode("builder");
-            setDefinitionJson(JSON.stringify({
-                "id": `definition-${Math.random().toString(36).substring(2, 9)}`,
-                "input_descriptors": [
-                    {
-                        "id": "identity_credential",
-                        "name": "Identity Credential",
-                        "purpose": "Verify identity",
-                        "constraints": {
-                            "fields": [
-                                {
-                                    "path": [
-                                        "$.type"
-                                    ],
-                                    "filter": {
-                                        "type": "string",
-                                        "pattern": "IdentityCredential"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                ]
-            }, null, 2));
-        }
-    }, [definition, isNew]);
 
     useEffect(() => {
         if (prefixError) {
@@ -133,38 +90,6 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
             }));
         }
     }, [prefixError]);
-
-    /**
-     * Handles form submission from JSON editor mode.
-     */
-    const handleFormSubmit = (values: any): void => {
-        const name: string = values instanceof Map ? values.get("name")?.toString() : values.name;
-        const description: string = values instanceof Map ? values.get("description")?.toString() : values.description;
-
-        let parsedJson: any;
-
-        try {
-            parsedJson = JSON.parse(definitionJson);
-        } catch (e) {
-            dispatch(addAlert<AlertInterface>({
-                description: "Invalid JSON format in definition.",
-                level: AlertLevels.ERROR,
-                message: "Invalid JSON"
-            }));
-            return;
-        }
-
-        if (!parsedJson.id) {
-            dispatch(addAlert<AlertInterface>({
-                description: "The Presentation Definition JSON must contain a top-level 'id' field.",
-                level: AlertLevels.ERROR,
-                message: "Missing ID in JSON"
-            }));
-            return;
-        }
-
-        submitDefinition(name, description, JSON.stringify(parsedJson));
-    };
 
     /**
      * Common submission logic.
@@ -279,138 +204,6 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
         return <ContentLoader />;
     }
 
-    /**
-     * Renders the mode toggle menu.
-     */
-    const renderModeToggle = (): ReactElement => (
-        <Menu secondary pointing>
-            <Menu.Item
-                name="Builder"
-                active={editorMode === "builder"}
-                onClick={() => setEditorMode("builder")}
-                data-componentid={`${componentId}-mode-builder`}
-            >
-                <Icon name="magic" />
-                Builder
-            </Menu.Item>
-            <Menu.Item
-                name="Advanced"
-                active={editorMode === "json"}
-                onClick={() => setEditorMode("json")}
-                data-componentid={`${componentId}-mode-json`}
-            >
-                <Icon name="code" />
-                Advanced (JSON)
-            </Menu.Item>
-        </Menu>
-    );
-
-    /**
-     * Renders the builder mode content.
-     */
-    const renderBuilderMode = (): ReactElement => (
-        <PresentationDefinitionWizard
-            initialData={initialFormData}
-            onCancel={handleWizardCancel}
-            onSubmit={handleWizardSubmit}
-            isSubmitting={isSubmitting}
-            submitButtonText={isNew ? "Create Definition" : "Update Definition"}
-            data-componentid={`${componentId}-wizard`}
-        />
-    );
-
-    /**
-     * Renders the JSON editor mode content.
-     */
-    const renderJsonMode = (): ReactElement => (
-        <EmphasizedSegment padded="very">
-            <Form
-                id={`${componentId}-form`}
-                onSubmit={handleFormSubmit}
-                uncontrolledForm={true}
-                initialValues={{
-                    description: definition?.description,
-                    name: definition?.name
-                }}
-            >
-                <Grid>
-                    <Grid.Row columns={1}>
-                        <Grid.Column mobile={16} tablet={16} computer={10}>
-                            <Field.Input
-                                ariaLabel="name"
-                                inputType="text"
-                                name="name"
-                                label="Name"
-                                required={true}
-                                placeholder="Enter defined name"
-                                maxLength={100}
-                                minLength={3}
-                                validation={(value: string) => {
-                                    if (!value) {
-                                        return "Name is required";
-                                    }
-                                }}
-                                data-componentid={`${componentId}-name`}
-                            />
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row columns={1}>
-                        <Grid.Column mobile={16} tablet={16} computer={10}>
-                            <Field.Textarea
-                                ariaLabel="description"
-                                name="description"
-                                label="Description"
-                                required={false}
-                                placeholder="Enter description"
-                                maxLength={1000}
-                                minLength={0}
-                                data-componentid={`${componentId}-description`}
-                            />
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row columns={1}>
-                        <Grid.Column mobile={16} tablet={16} computer={16}>
-                            <div className="field">
-                                <label>Definition JSON <span className="ui text-danger">*</span></label>
-                                <Message info size="small">
-                                    <Icon name="info circle" />
-                                    For guided editing, switch to <strong>Builder</strong> mode above.
-                                </Message>
-                                <div style={{ border: "1px solid #ccc", height: "400px" }}>
-                                    <CodeEditor
-                                        lint
-                                        language="json"
-                                        sourceCode={definitionJson}
-                                        options={{
-                                            lineWrapping: true
-                                        }}
-                                        onChange={(editor: any, data: any, value: string) => {
-                                            setDefinitionJson(value);
-                                        }}
-                                        theme={"light"}
-                                    />
-                                </div>
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row columns={1}>
-                        <Grid.Column mobile={16} tablet={16} computer={10}>
-                            <Field.Button
-                                form={`${componentId}-form`}
-                                size="small"
-                                buttonType="primary_btn"
-                                ariaLabel="submit"
-                                name="submit"
-                                loading={isSubmitting}
-                                label={isNew ? "Create" : "Update"}
-                            />
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
-            </Form>
-        </EmphasizedSegment>
-    );
-
     return (
         <PageLayout
             pageTitle={isNew ? "New Presentation Definition" : definition?.name}
@@ -423,11 +216,14 @@ const PresentationDefinitionEditPage: FunctionComponent<PresentationDefinitionEd
             contentTopMargin={true}
             data-componentid={`${componentId}-page-layout`}
         >
-            {/* Mode Toggle */}
-            {renderModeToggle()}
-
-            {/* Content based on mode */}
-            {editorMode === "builder" ? renderBuilderMode() : renderJsonMode()}
+            <PresentationDefinitionWizard
+                initialData={initialFormData}
+                onCancel={handleWizardCancel}
+                onSubmit={handleWizardSubmit}
+                isSubmitting={isSubmitting}
+                submitButtonText={isNew ? "Create Definition" : "Update Definition"}
+                data-componentid={`${componentId}-wizard`}
+            />
 
             {/* Danger Zone for existing definitions */}
             {!isNew && (
