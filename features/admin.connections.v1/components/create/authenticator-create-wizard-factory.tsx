@@ -38,6 +38,7 @@ import { ExpertModeAuthenticationProviderCreateWizard } from
 import { OrganizationEnterpriseConnectionCreateWizard } from
     "../wizards/organization-enterprise/organization-enterprise-connection-create-wizard";
 import { TrustedTokenIssuerCreateWizard } from "../wizards/trusted-token-issuer-create-wizard";
+import { DigitalCredentialsCreateWizard } from "../wizards/digital-credentials-create-wizard";
 
 /**
  * Proptypes for the Authenticator Create Wizard factory.
@@ -341,6 +342,23 @@ export const AuthenticatorCreateWizardFactory: FC<AuthenticatorCreateWizardFacto
                                     "pluginBased.name")
                                 : selectedTemplateWithUniqueName?.name
                         }
+                        subTitle={ selectedTemplateWithUniqueName?.description }
+                        onWizardClose={ () => {
+                            setSelectedTemplateWithUniqueName(undefined);
+                            setSelectedTemplate(undefined);
+                            handleModalVisibility(false);
+                            onWizardClose();
+                        } }
+                        template={ selectedTemplateWithUniqueName }
+                        data-componentid={ selectedTemplate?.templateId }
+                        { ...rest }
+                    />
+                );
+
+            case "digital-credentials":
+                return (
+                    <DigitalCredentialsCreateWizard
+                        title={ selectedTemplateWithUniqueName?.name }
                         subTitle={ selectedTemplateWithUniqueName?.description }
                         onWizardClose={ () => {
                             setSelectedTemplateWithUniqueName(undefined);
