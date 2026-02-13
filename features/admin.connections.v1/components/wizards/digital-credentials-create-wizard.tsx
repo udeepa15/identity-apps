@@ -21,6 +21,7 @@ import { Heading, LinkButton, PrimaryButton, Steps } from "@wso2is/react-compone
 import React, { FunctionComponent, ReactElement, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal } from "semantic-ui-react";
+import { SummaryStep } from "./steps/summary-step";
 import { VerificationSettingsStep } from "./steps/verification-settings-step";
 import { ConnectionTemplateInterface, GenericConnectionCreateWizardPropsInterface } from "../../models/connection";
 import { GeneralSettings } from "./steps/shared-steps/general-settings";
@@ -60,6 +61,7 @@ export const DigitalCredentialsCreateWizard: FunctionComponent<DigitalCredential
     
     const [ finishSubmit, setFinishSubmit ] = useState<boolean>(false);
     const [ generalSettingsSubmit, setGeneralSettingsSubmit ] = useState<boolean>(false);
+    const [ verificationSettingsSubmit, setVerificationSettingsSubmit ] = useState<boolean>(false);
 
     /**
      * Handles the step change.
@@ -70,7 +72,9 @@ export const DigitalCredentialsCreateWizard: FunctionComponent<DigitalCredential
         if (currentStep === 0) {
             setGeneralSettingsSubmit(true);
         } else if (currentStep === 1) {
-            setFinishSubmit(true);
+            setVerificationSettingsSubmit(true);
+        } else if (currentStep === 2) {
+             setFinishSubmit(true);
         } else {
             setCurrentStep(nextStep);
         }
@@ -93,12 +97,20 @@ export const DigitalCredentialsCreateWizard: FunctionComponent<DigitalCredential
      * @param values - Form values.
      */
     const handleVerificationSettingsSubmit = (values: any): void => {
-        setFinishSubmit(false);
-        const finalData = { ...wizardState, ...values };
-        setWizardState(finalData);
-        
-        // Final submission
-        handleWizardFormFinish(finalData);
+        setVerificationSettingsSubmit(false);
+        setWizardState({ ...wizardState, ...values });
+        setCurrentStep(currentStep + 1);
+    };
+
+    /**
+     * Handles the summary submit.
+     *
+     * @param values - Form values.
+     */
+    const handleSummarySubmit = (values: any): void => {
+         setFinishSubmit(false);
+         const finalData = { ...wizardState, ...values };
+         handleWizardFormFinish(finalData);
     };
 
     /**
@@ -154,13 +166,24 @@ export const DigitalCredentialsCreateWizard: FunctionComponent<DigitalCredential
         {
             content: (
                 <VerificationSettingsStep
-                    triggerSubmit={ finishSubmit }
+                    triggerSubmit={ verificationSettingsSubmit }
                     initialValues={ wizardState }
                     onSubmit={ handleVerificationSettingsSubmit }
                 />
             ),
             icon: null,
             title: "Verification Settings"
+        },
+        {
+            content: (
+                <SummaryStep
+                    triggerSubmit={ finishSubmit }
+                    wizardState={ wizardState }
+                    onSubmit={ handleSummarySubmit }
+                />
+            ),
+            icon: null,
+            title: "Summary"
         }
     ];
 
