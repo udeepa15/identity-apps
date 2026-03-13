@@ -44,6 +44,7 @@ export class CommonAuthenticatorConstants {
     public static readonly CONNECTION_TEMPLATE_IDS: {
         APPLE: string;
         CUSTOM_AUTHENTICATOR: string;
+        DIGITAL_CREDENTIALS: string;
         ENTERPRISE: string;
         EXPERT_MODE: string;
         EXTERNAL_CUSTOM_AUTHENTICATOR: string;
@@ -66,6 +67,7 @@ export class CommonAuthenticatorConstants {
     } = {
             APPLE: "apple-idp",
             CUSTOM_AUTHENTICATOR: "custom-authenticator",
+            DIGITAL_CREDENTIALS: "digital-credentials",
             ENTERPRISE: "enterprise-idp",
             EXPERT_MODE: "expert-mode-idp",
             EXTERNAL_CUSTOM_AUTHENTICATOR: "external-custom-authenticator",
