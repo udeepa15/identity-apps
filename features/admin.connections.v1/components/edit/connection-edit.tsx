@@ -31,6 +31,7 @@ import {
     AttributeSettings,
     AuthenticatorSettings,
     ConnectedApps,
+    DigitalCredentialsPresentationDefinitionClaims,
     GeneralSettings,
     IdentityProviderGroupsTab,
     OutboundProvisioningSettings
@@ -175,6 +176,8 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
     const isOrganizationEnterpriseAuthenticator: boolean =
         identityProvider?.federatedAuthenticators?.defaultAuthenticatorId ===
         FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.ORGANIZATION_ENTERPRISE_AUTHENTICATOR_ID;
+    const isDigitalCredentialsConnection: boolean = identityProvider?.templateId ===
+        CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.DIGITAL_CREDENTIALS;
     const isEnterpriseConnection: boolean =
         identityProvider?.federatedAuthenticators?.defaultAuthenticatorId ===
             FederatedAuthenticatorConstants.AUTHENTICATOR_IDS.SAML_AUTHENTICATOR_ID ||
@@ -369,6 +372,46 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
         </ResourceTab.Pane>
     );
 
+    const DigitalCredentialsConfigurationTabPane = (): ReactElement => (
+        <ResourceTab.Pane controlledSegmentation>
+            <GeneralSettings
+                hideIdPLogoEditField={ ConnectionsManagementUtils.hideLogoInputFieldInIdPGeneralSettingsForm(
+                    identityProvider?.templateId
+                ) }
+                templateType={ type }
+                isSaml={ isSaml }
+                isOidc={ isOidc }
+                isCustomAuthenticator={ isCustomAuthenticator }
+                editingIDP={ identityProvider }
+                isLoading={ isLoading }
+                onDelete={ onDelete }
+                onUpdate={ onUpdate }
+                data-testid={ `${testId}-general-settings` }
+                isReadOnly={ isReadOnly }
+                loader={ Loader }
+            />
+            <AuthenticatorSettings
+                connectionSettingsMetaData={ connectionSettingsMetaData }
+                identityProvider={ identityProvider }
+                isLoading={ isLoading }
+                onUpdate={ onUpdate }
+                data-testid={ `${testId}-authenticator-settings` }
+                isReadOnly={ isReadOnly }
+                loader={ Loader }
+            />
+        </ResourceTab.Pane>
+    );
+
+    const DigitalCredentialsPresentationDefinitionClaimsTabPane = (): ReactElement => (
+        <ResourceTab.Pane controlledSegmentation>
+            <DigitalCredentialsPresentationDefinitionClaims
+                identityProvider={ identityProvider }
+                isReadOnly={ isReadOnly }
+                data-testid={ `${ testId }-digital-credentials-pd-claims` }
+            />
+        </ResourceTab.Pane>
+    );
+
     useEffect(() => {
         setIsTrustedTokenIssuer(type === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.TRUSTED_TOKEN_ISSUER);
         setIsExpertMode(type === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.EXPERT_MODE);
@@ -427,6 +470,28 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
 
     const getPanes = () => {
         const panes: ResourceTabPaneInterface[] = [];
+
+        if (isDigitalCredentialsConnection) {
+            panes.push({
+                "data-tabid": "digital-credentials-configuration",
+                menuItem: "Configuration",
+                render: DigitalCredentialsConfigurationTabPane
+            });
+
+            panes.push({
+                "data-tabid": "digital-credentials-presentation-definition-claims",
+                menuItem: "Presentation Definition Claims",
+                render: DigitalCredentialsPresentationDefinitionClaimsTabPane
+            });
+
+            panes.push({
+                "data-tabid": "digital-credentials-claim-mapping",
+                menuItem: "Claim Mapping",
+                render: AttributeSettingsTabPane
+            });
+
+            return panes;
+        }
 
         if (tabPaneExtensions && tabPaneExtensions.length > 0) {
             panes.push(...tabPaneExtensions);
@@ -584,6 +649,7 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
             !isExpertMode &&
             !isCustomAuthenticator &&
             !isOutboundProvisioningConnection &&
+            !isDigitalCredentialsConnection &&
             !tabPaneExtensions)
     ) {
         return <Loader />;

@@ -28,28 +28,26 @@ import {
     Heading,
     LinkButton,
     PrimaryButton,
-    Steps,
     useWizardAlert
 } from "@wso2is/react-components";
 import { AxiosError, AxiosResponse } from "axios";
 import cloneDeep from "lodash-es/cloneDeep";
 import get from "lodash-es/get";
 import isEmpty from "lodash-es/isEmpty";
-import React, { FunctionComponent, MutableRefObject, ReactElement, useMemo, useRef, useState } from "react";
+import React, { FunctionComponent, MutableRefObject, ReactElement, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { Icon, Grid as SemanticGrid } from "semantic-ui-react";
+import { Grid as SemanticGrid } from "semantic-ui-react";
+import CreateConnectionWizardHelp from "./create-wizard-help";
 import {
     createConnection,
     createPresentationDefinition,
     CreatePresentationDefinitionRequestInterface,
     CreatePresentationDefinitionResponseInterface,
-    getPresentationDefinitionClaims,
     PresentationDefinitionCredentialInterface
 } from "../../api/connections";
 import {
-    ConnectionClaimMappingInterface,
     ConnectionInterface,
     GenericConnectionCreateWizardPropsInterface
 } from "../../models/connection";
@@ -59,37 +57,17 @@ interface DigitalCredentialsConnectionCreateWizardPropsInterface extends
     GenericConnectionCreateWizardPropsInterface, IdentifiableComponentInterface {
 }
 
-enum WizardSteps {
-    CONNECTION_DETAILS = "ConnectionDetails",
-    PRESENTATION_DEFINITION = "PresentationDefinition"
-}
-
-interface WizardStepInterface {
-    icon: string;
-    name: WizardSteps;
-    title: string;
-}
-
 interface DigitalCredentialWizardFormValuesInterface {
-    credentials: string;
     description?: string;
     name: string;
-    pdDescription?: string;
-    pdName: string;
-    responseMode: string;
-    subjectClaim?: string;
-    timeout: string;
+    vcDescription: string;
+    vcIssuer: string;
+    vcType: string;
 }
 
 interface WizardRefInterface {
-    previousPage: () => void;
-    submitForm: () => void;
+    gotoNextPage: () => void;
 }
-
-const DEFAULT_RESPONSE_MODE: string = "direct_post";
-const DEFAULT_SUBJECT_CLAIM: string = "email";
-const DEFAULT_TIMEOUT: string = "300";
-const EMAIL_LOCAL_CLAIM_URI: string = "http://wso2.org/claims/emailaddress";
 
 export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
     DigitalCredentialsConnectionCreateWizardPropsInterface
@@ -110,7 +88,6 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
     const dispatch: Dispatch = useDispatch();
     const { UIConfig } = useUIConfig();
 
-    const [ currentWizardStep, setCurrentWizardStep ] = useState<number>(0);
     const [ nextShouldBeDisabled, setNextShouldBeDisabled ] = useState<boolean>(false);
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
     const [ alert, setAlert, alertComponent ] = useWizardAlert();
@@ -118,42 +95,16 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
     const wizardRef: MutableRefObject<WizardRefInterface> = useRef<WizardRefInterface>(null);
     const eventPublisher: EventPublisher = EventPublisher.getInstance();
 
-    const wizardSteps: WizardStepInterface[] = useMemo(() => ([
-        {
-            icon: "setting",
-            name: WizardSteps.CONNECTION_DETAILS,
-            title: "Connection Details"
-        },
-        {
-            icon: "id badge",
-            name: WizardSteps.PRESENTATION_DEFINITION,
-            title: "Presentation Definition"
-        }
-    ]), []);
-
     const initialValues: DigitalCredentialWizardFormValuesInterface = {
-        credentials: "[{\"type\":\"EmployeeBadge1\",\"purpose\":\"Please share your employee badge to prove employment.\",\"issuer\":\"did:web:masked-unprofitably-ardith.ngrok-free.dev\",\"claims\":[\"email\",\"first_name\"]},{\"type\":\"EmployeeBadge2\",\"purpose\":\"Please share your employee badge to prove employment.\",\"issuer\":\"did:web:masked-unprofitably-ardith.ngrok-free.dev\",\"claims\":[\"firstName\"]}]",
         description: "Minimal OpenID4VP connection - extracts all VC claims (no filtering)",
         name: "Digital Credentials",
-        pdDescription: "Verifies employee credentials",
-        pdName: "Employee Credential Verification (email,firstName)",
-        responseMode: DEFAULT_RESPONSE_MODE,
-        subjectClaim: DEFAULT_SUBJECT_CLAIM,
-        timeout: DEFAULT_TIMEOUT
+        vcDescription: "Please share your employee badge to prove employment.",
+        vcIssuer: "did:web:masked-unprofitably-ardith.ngrok-free.dev",
+        vcType: "EmployeeBadge"
     };
 
     const resolveConnectionIcon = (): string => {
         return ConnectionsManagementUtils.resolveConnectionResourcePath("", template?.image);
-    };
-
-    const parseCredentials = (credentialsValue: string): PresentationDefinitionCredentialInterface[] => {
-        const parsedCredentials: unknown = JSON.parse(credentialsValue);
-
-        if (!Array.isArray(parsedCredentials)) {
-            throw new Error("Credentials should be a JSON array.");
-        }
-
-        return parsedCredentials as PresentationDefinitionCredentialInterface[];
     };
 
     const extractPresentationDefinitionId = (
@@ -174,47 +125,32 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
         throw new Error("Presentation definition ID is missing in the create response.");
     };
 
-    const buildClaimMappings = (claims: string[], subjectClaim: string): ConnectionClaimMappingInterface[] => {
-        const resolvedClaim: string = !isEmpty(subjectClaim)
-            ? subjectClaim
-            : (claims?.length > 0 ? claims[ 0 ] : DEFAULT_SUBJECT_CLAIM);
-
-        return [
+    const createConnectionFromValues = async (values: DigitalCredentialWizardFormValuesInterface): Promise<void> => {
+        const credentials: PresentationDefinitionCredentialInterface[] = [
             {
-                idpClaim: resolvedClaim,
-                localClaim: {
-                    uri: EMAIL_LOCAL_CLAIM_URI
-                }
+                claims: [],
+                issuer: values.vcIssuer,
+                purpose: values.vcDescription,
+                type: values.vcType
             }
         ];
-    };
 
-    const createConnectionFromValues = async (values: DigitalCredentialWizardFormValuesInterface): Promise<void> => {
-        const credentials: PresentationDefinitionCredentialInterface[] = parseCredentials(values.credentials);
-        const inputClaims: string[] = credentials
-            .flatMap((credential: PresentationDefinitionCredentialInterface) => credential?.claims ?? []);
+        const presentationDefinitionName: string = values.name;
+        const presentationDefinitionDescription: string = values.description;
 
         const pdRequest: CreatePresentationDefinitionRequestInterface = {
             credentials,
-            description: values.pdDescription,
-            name: values.pdName
+            description: presentationDefinitionDescription,
+            name: presentationDefinitionName
         };
+
+        console.log("[Digital Credentials] Presentation Definition create payload:", pdRequest);
 
         const createPDResponse: AxiosResponse<CreatePresentationDefinitionResponseInterface> =
             await createPresentationDefinition(pdRequest);
+        console.log("[Digital Credentials] Presentation Definition create response:", createPDResponse?.data);
+
         const presentationDefinitionId: string = extractPresentationDefinitionId(createPDResponse);
-
-        let mappedClaims: string[] = inputClaims;
-
-        try {
-            const claimsResponse: AxiosResponse<string[]> = await getPresentationDefinitionClaims(presentationDefinitionId);
-
-            if (claimsResponse?.data?.length > 0) {
-                mappedClaims = claimsResponse.data;
-            }
-        } catch (error) {
-            // Ignore claims fetch errors and continue with the claims provided by the user.
-        }
 
         const connection: ConnectionInterface = cloneDeep(template.idp);
 
@@ -226,28 +162,8 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
             {
                 key: "presentationDefinitionId",
                 value: presentationDefinitionId
-            },
-            {
-                key: "responseMode",
-                value: values.responseMode
-            },
-            {
-                key: "timeout",
-                value: values.timeout
-            },
-            {
-                key: "subjectClaim",
-                value: values.subjectClaim
             }
         ];
-
-        connection.claims = {
-            mappings: buildClaimMappings(mappedClaims, values.subjectClaim),
-            provisioningClaims: [],
-            userIdClaim: {
-                uri: EMAIL_LOCAL_CLAIM_URI
-            }
-        };
 
         if (!isEmpty(UIConfig?.connectionResourcesUrl)) {
             connection.image = UIConfig.connectionResourcesUrl + template.image;
@@ -255,7 +171,10 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
             connection.image = resolveConnectionIcon();
         }
 
+        console.log("[Digital Credentials] Connection create payload:", connection);
+
         const response: AxiosResponse<ConnectionInterface> = await createConnection(connection);
+        console.log("[Digital Credentials] Connection create response:", response?.data);
 
         eventPublisher.publish("connections-finish-adding-connection", {
             type: componentId
@@ -303,12 +222,16 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
         }
     };
 
-    const connectionDetailsPage = (): ReactElement => (
+    const singlePage = (): ReactElement => (
         <WizardPage
             validate={ (values: DigitalCredentialWizardFormValuesInterface) => {
                 const errors: Record<string, string> = {};
 
                 errors.name = composeValidators(required, length({ max: 50, min: 3 }))(values.name);
+                errors.vcType = composeValidators(required, length({ max: 100, min: 3 }))(values.vcType);
+                errors.vcDescription = composeValidators(required, length({ max: 500, min: 3 }))(values.vcDescription);
+                errors.vcIssuer = composeValidators(required, length({ max: 2048, min: 3 }))(values.vcIssuer);
+
                 setNextShouldBeDisabled(ifFieldsHave(errors));
 
                 return errors;
@@ -329,99 +252,95 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
                 ariaLabel="Connection description"
                 name="description"
                 label="Description"
-                inputType="textarea"
+                inputType="description"
                 required={ false }
                 maxLength={ 300 }
                 minLength={ 0 }
                 width={ 15 }
                 placeholder="Minimal OpenID4VP connection - extracts all VC claims (no filtering)"
             />
-        </WizardPage>
-    );
-
-    const presentationDefinitionPage = (): ReactElement => (
-        <WizardPage
-            validate={ (values: DigitalCredentialWizardFormValuesInterface) => {
-                const errors: Record<string, string> = {};
-
-                errors.pdName = composeValidators(required, length({ max: 100, min: 3 }))(values.pdName);
-                errors.credentials = composeValidators(required, validCredentialsJSON)(values.credentials);
-                errors.responseMode = composeValidators(required)(values.responseMode);
-                errors.timeout = composeValidators(required)(values.timeout);
-
-                setNextShouldBeDisabled(ifFieldsHave(errors));
-
-                return errors;
-            } }
-        >
             <Field.Input
-                ariaLabel="Presentation definition name"
-                name="pdName"
-                label="Presentation Definition Name"
+                ariaLabel="VC type"
+                name="vcType"
+                label="VC Type"
                 inputType="text"
                 required={ true }
                 maxLength={ 100 }
                 minLength={ 3 }
                 width={ 15 }
-                placeholder="Employee Credential Verification (email,firstName)"
+                placeholder="EmployeeBadge"
             />
             <Field.Input
-                ariaLabel="Presentation definition description"
-                name="pdDescription"
-                label="Presentation Definition Description"
-                inputType="textarea"
-                required={ false }
-                maxLength={ 300 }
-                minLength={ 0 }
-                width={ 15 }
-                placeholder="Verifies employee credentials"
-            />
-            <Field.Input
-                ariaLabel="Credentials"
-                name="credentials"
-                label="Credentials"
-                inputType="textarea"
+                ariaLabel="VC description"
+                name="vcDescription"
+                label="VC Description"
+                inputType="description"
                 required={ true }
-                maxLength={ 4000 }
-                minLength={ 1 }
-                width={ 15 }
-                placeholder="Paste credentials as a JSON array."
-            />
-            <Field.Input
-                ariaLabel="Response mode"
-                name="responseMode"
-                label="Response Mode"
-                inputType="text"
-                required={ true }
-                maxLength={ 50 }
+                maxLength={ 500 }
                 minLength={ 3 }
                 width={ 15 }
-                placeholder="direct_post"
+                placeholder="Please share your employee badge to prove employment."
             />
             <Field.Input
-                ariaLabel="Timeout"
-                name="timeout"
-                label="Timeout (seconds)"
-                inputType="number"
-                required={ true }
-                maxLength={ 10 }
-                minLength={ 1 }
-                width={ 15 }
-                placeholder="300"
-            />
-            <Field.Input
-                ariaLabel="Subject claim"
-                name="subjectClaim"
-                label="Subject Claim"
+                ariaLabel="VC issuer"
+                name="vcIssuer"
+                label="VC Issuer"
                 inputType="text"
-                required={ false }
-                maxLength={ 100 }
-                minLength={ 0 }
+                required={ true }
+                maxLength={ 2048 }
+                minLength={ 3 }
                 width={ 15 }
-                placeholder="email"
+                placeholder="did:web:masked-unprofitably-ardith.ngrok-free.dev"
             />
         </WizardPage>
     );
+
+    const renderHelpPanel = (): ReactElement => {
+        return (
+            <ModalWithSidePanel.SidePanel>
+                <ModalWithSidePanel.Header className="wizard-header help-panel-header muted">
+                    <div className="help-panel-header-text">
+                        Help
+                    </div>
+                </ModalWithSidePanel.Header>
+                <ModalWithSidePanel.Content>
+                    <CreateConnectionWizardHelp
+                        wizardHelp={ {
+                            fields: [
+                                {
+                                    fieldName: "Name",
+                                    hint: "Provide a unique name for the connection."
+                                },
+                                {
+                                    fieldName: "Description",
+                                    hint: "Provide a short description for the connection."
+                                },
+                                {
+                                    fieldName: "VC Type",
+                                    hint: "Provide the verifiable credential type (for example EmployeeBadge)."
+                                },
+                                {
+                                    fieldName: "VC Description",
+                                    hint: "Provide the purpose shown to users when requesting the credential."
+                                },
+                                {
+                                    fieldName: "VC Issuer",
+                                    hint: "Provide the trusted issuer DID or URL used in presentation definition creation."
+                                }
+                            ],
+                            message: {
+                                header: "Prerequisites",
+                                paragraphs: [
+                                    "When you click <strong>Create</strong>, the console first creates a Presentation Definition and then creates the connection using the generated definition ID.",
+                                    "Ensure the issuer is reachable and trusted for your credential verification flow."
+                                ]
+                            }
+                        } }
+                    />
+                </ModalWithSidePanel.Content>
+            </ModalWithSidePanel.SidePanel>
+        );
+    };
 
     return (
         <ModalWithSidePanel
@@ -459,17 +378,6 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
                         </div>
                     </div>
                 </ModalWithSidePanel.Header>
-                <ModalWithSidePanel.Content className="steps-container">
-                    <Steps.Group current={ currentWizardStep }>
-                        { wizardSteps.map((step: WizardStepInterface, index: number) => (
-                            <Steps.Step
-                                key={ index }
-                                icon={ step.icon }
-                                title={ step.title }
-                            />
-                        )) }
-                    </Steps.Group>
-                </ModalWithSidePanel.Content>
                 <ModalWithSidePanel.Content className="content-container">
                     { alert && alertComponent }
                     <Wizard2
@@ -477,10 +385,8 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
                         initialValues={ initialValues }
                         onSubmit={ handleFormSubmit }
                         uncontrolledForm={ true }
-                        pageChanged={ (index: number) => setCurrentWizardStep(index) }
                     >
-                        { connectionDetailsPage() }
-                        { presentationDefinitionPage() }
+                        { singlePage() }
                     </Wizard2>
                 </ModalWithSidePanel.Content>
                 <ModalWithSidePanel.Actions>
@@ -492,36 +398,20 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
                                 </LinkButton>
                             </SemanticGrid.Column>
                             <SemanticGrid.Column mobile={ 8 } tablet={ 8 } computer={ 8 }>
-                                { currentWizardStep < wizardSteps.length - 1 && (
-                                    <PrimaryButton
-                                        disabled={ nextShouldBeDisabled || isSubmitting }
-                                        floated="right"
-                                        onClick={ () => wizardRef?.current?.submitForm() }
-                                    >
-                                        { t("authenticationProvider:wizards.buttons.next") }
-                                        <Icon name="arrow right"/>
-                                    </PrimaryButton>
-                                ) }
-                                { currentWizardStep === wizardSteps.length - 1 && (
-                                    <PrimaryButton
-                                        loading={ isSubmitting }
-                                        disabled={ nextShouldBeDisabled || isSubmitting }
-                                        floated="right"
-                                        onClick={ () => wizardRef?.current?.submitForm() }
-                                    >
-                                        { t("authenticationProvider:wizards.buttons.finish") }
-                                    </PrimaryButton>
-                                ) }
-                                { currentWizardStep > 0 && (
-                                    <LinkButton floated="right" onClick={ () => wizardRef?.current?.previousPage() }>
-                                        { t("authenticationProvider:wizards.buttons.previous") }
-                                    </LinkButton>
-                                ) }
+                                <PrimaryButton
+                                    loading={ isSubmitting }
+                                    disabled={ nextShouldBeDisabled || isSubmitting }
+                                    floated="right"
+                                    onClick={ () => wizardRef?.current?.gotoNextPage() }
+                                >
+                                    { t("common:create") }
+                                </PrimaryButton>
                             </SemanticGrid.Column>
                         </SemanticGrid.Row>
                     </SemanticGrid>
                 </ModalWithSidePanel.Actions>
             </ModalWithSidePanel.MainPanel>
+            { renderHelpPanel() }
         </ModalWithSidePanel>
     );
 };
@@ -552,18 +442,4 @@ const length = (minMax: { min: number; max: number }) => (value: string): string
     }
 
     return undefined;
-};
-
-const validCredentialsJSON = (value: string): string => {
-    try {
-        const parsedValue: unknown = JSON.parse(value);
-
-        if (!Array.isArray(parsedValue)) {
-            return "Credentials should be a JSON array.";
-        }
-
-        return undefined;
-    } catch (error) {
-        return "Credentials should be a valid JSON array.";
-    }
 };
