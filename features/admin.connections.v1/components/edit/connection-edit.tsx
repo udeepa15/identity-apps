@@ -376,6 +376,7 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
     const DigitalCredentialsConfigurationTabPane = (): ReactElement => (
         <ResourceTab.Pane controlledSegmentation>
             <GeneralSettings
+                showOnlyNameAndDescription={ true }
                 hideIdPLogoEditField={ ConnectionsManagementUtils.hideLogoInputFieldInIdPGeneralSettingsForm(
                     identityProvider?.templateId
                 ) }
@@ -388,15 +389,6 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
                 onDelete={ onDelete }
                 onUpdate={ onUpdate }
                 data-testid={ `${testId}-general-settings` }
-                isReadOnly={ isReadOnly }
-                loader={ Loader }
-            />
-            <AuthenticatorSettings
-                connectionSettingsMetaData={ connectionSettingsMetaData }
-                identityProvider={ identityProvider }
-                isLoading={ isLoading }
-                onUpdate={ onUpdate }
-                data-testid={ `${testId}-authenticator-settings` }
                 isReadOnly={ isReadOnly }
                 loader={ Loader }
             />
@@ -494,7 +486,7 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
 
             panes.push({
                 "data-tabid": "digital-credentials-presentation-definition-claims",
-                menuItem: "Presentation Definition Claims",
+                menuItem: "Presentation Definiton",
                 render: DigitalCredentialsPresentationDefinitionClaimsTabPane
             });
 
