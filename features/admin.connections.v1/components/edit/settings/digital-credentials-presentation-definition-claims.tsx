@@ -35,6 +35,7 @@ import {
     updatePresentationDefinition
 } from "../../../api/connections";
 import { ConnectionInterface, CommonPluggableComponentPropertyInterface } from "../../../models/connection";
+import "./digital-credentials-presentation-definition-claims.scss";
 
 interface DigitalCredentialsPresentationDefinitionClaimsPropsInterface extends TestableComponentInterface {
     identityProvider: ConnectionInterface;
@@ -234,6 +235,16 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
     };
 
     const onSaveChanges = (): void => {
+        if (isEmpty(vcType?.trim()) || isEmpty(vcPurpose?.trim()) || isEmpty(issuer?.trim())) {
+            dispatch(addAlert({
+                description: "Credential Type, Request Purpose, and Trusted Issuer are required.",
+                level: AlertLevels.ERROR,
+                message: "Cannot update with blank required fields"
+            }));
+
+            return;
+        }
+
         savePresentationDefinition();
     };
 
@@ -243,9 +254,9 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
 
     return (
         <div data-testid={ testId }>
-            <Form>
+            <Form className="digital-credentials-pd-claims-form">
                 <Form.Field>
-                    <label>VC Type</label>
+                    <label>Credential Type</label>
                     <Input
                         value={ vcType }
                         readOnly={ isReadOnly }
@@ -253,10 +264,14 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                             setVcType(data.value);
                         } }
                     />
+                    <p className="ui-hint">
+                        <Icon floated="left" aria-hidden="true" className="grey info circle icon" />
+                        This must exactly match the type name defined by the issuer.
+                    </p>
                 </Form.Field>
 
                 <Form.Field>
-                    <label>VC Description</label>
+                    <label>Request Purpose</label>
                     <Input
                         value={ vcPurpose }
                         readOnly={ isReadOnly }
@@ -264,10 +279,14 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                             setVcPurpose(data.value);
                         } }
                     />
+                    <p className="ui-hint">
+                        <Icon floated="left" aria-hidden="true" className="grey info circle icon" />
+                        A short message displayed in the user&apos;s wallet app.
+                    </p>
                 </Form.Field>
 
                 <Form.Field>
-                    <label>Issuer</label>
+                    <label>Trusted Issuer</label>
                     <Input
                         value={ issuer }
                         readOnly={ isReadOnly }
@@ -275,12 +294,20 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                             setIssuer(data.value);
                         } }
                     />
+                    <p className="ui-hint">
+                        <Icon floated="left" aria-hidden="true" className="grey info circle icon" />
+                        Credential issued organization.
+                    </p>
                 </Form.Field>
 
                 <Divider hidden />
 
                 <Form.Field>
-                    <label>Claims</label>
+                    <label>Requested Attributes</label>
+                    <p className="ui-hint">
+                        <Icon floated="left" aria-hidden="true" className="grey info circle icon" />
+                        The specific pieces of data from this credential.
+                    </p>
                     {
                         claims?.length > 0
                             ? claims.map((claim: string) => (
@@ -301,10 +328,10 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                     !isReadOnly && (
                         <>
                             <Form.Field>
-                                <label>Add claim</label>
+                                <label>Add attribute</label>
                                 <Input
                                     value={ draftClaim }
-                                    placeholder="email"
+                                    placeholder="Enter attribute name (e.g., email)"
                                     onChange={ (_event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => {
                                         setDraftClaim(data.value);
                                     } }
@@ -315,7 +342,17 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                                     } }
                                 />
                             </Form.Field>
-                            <PrimaryButton type="button" loading={ isSubmitting } onClick={ onSaveChanges }>
+                            <PrimaryButton
+                                type="button"
+                                loading={ isSubmitting }
+                                disabled={
+                                    isSubmitting
+                                        || isEmpty(vcType?.trim())
+                                        || isEmpty(vcPurpose?.trim())
+                                        || isEmpty(issuer?.trim())
+                                }
+                                onClick={ onSaveChanges }
+                            >
                                 Update
                             </PrimaryButton>
                         </>
