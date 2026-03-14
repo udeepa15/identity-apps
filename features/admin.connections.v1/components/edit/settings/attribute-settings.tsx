@@ -124,6 +124,11 @@ interface AttributeSelectionPropsInterface extends TestableComponentInterface {
      * Is the IdP type SAML
      */
     isSaml: boolean;
+    /**
+     * Restricts external claim values that can be mapped.
+     * If provided, users can only map to these values.
+     */
+    allowedMappedValues?: string[];
 }
 
 export const LocalDialectURI: string = "http://wso2.org/claims";
@@ -144,6 +149,7 @@ export const AttributeSettings: FunctionComponent<AttributeSelectionPropsInterfa
         loader: Loader,
         isOIDC,
         isSaml,
+        allowedMappedValues,
         [ "data-testid" ]: testId
     } = props;
 
@@ -282,6 +288,17 @@ export const AttributeSettings: FunctionComponent<AttributeSelectionPropsInterfa
         ) {
             canSubmit = false;
         }
+
+        if (!isEmpty(allowedMappedValues)) {
+            const allowedValuesSet: Set<string> = new Set(allowedMappedValues);
+
+            if (!isEmpty(selectedClaimsWithMapping?.filter(
+                (element: ConnectionCommonClaimMappingInterface) => !allowedValuesSet.has(element.mappedValue)
+            ))) {
+                canSubmit = false;
+            }
+        }
+
         claimConfigurations["mappings"] = selectedClaimsWithMapping.map(
             (element: ConnectionCommonClaimMappingInterface) => {
                 return {
@@ -392,6 +409,7 @@ export const AttributeSettings: FunctionComponent<AttributeSelectionPropsInterfa
                                         setSelectedClaimsWithMapping([ ...mappingsToBeAdded ]);
                                     }
                                 }
+                                allowedMappedValues={ allowedMappedValues }
                                 attributeList={
                                     hideIdentityClaimAttributes
                                         ? availableLocalClaims.filter(
@@ -488,6 +506,7 @@ export const AttributeSettings: FunctionComponent<AttributeSelectionPropsInterfa
  * Default proptypes for the IDP attribute settings component.
  */
 AttributeSettings.defaultProps = {
+    allowedMappedValues: undefined,
     "data-testid": "idp-edit-attribute-settings",
     hideIdentityClaimAttributes: false,
     provisioningAttributesEnabled: true

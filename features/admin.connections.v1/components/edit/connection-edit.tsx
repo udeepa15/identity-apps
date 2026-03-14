@@ -31,6 +31,7 @@ import {
     AttributeSettings,
     AuthenticatorSettings,
     ConnectedApps,
+    DigitalCredentialsClaimMappingSettings,
     DigitalCredentialsPresentationDefinitionClaims,
     GeneralSettings,
     IdentityProviderGroupsTab,
@@ -412,6 +413,19 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
         </ResourceTab.Pane>
     );
 
+    const DigitalCredentialsClaimMappingTabPane = (): ReactElement => (
+        <ResourceTab.Pane controlledSegmentation>
+            <DigitalCredentialsClaimMappingSettings
+                identityProvider={ identityProvider }
+                isLoading={ isLoading }
+                isReadOnly={ isReadOnly }
+                onUpdate={ onUpdate }
+                loader={ Loader }
+                data-testid={ `${ testId }-digital-credentials-claim-mapping` }
+            />
+        </ResourceTab.Pane>
+    );
+
     useEffect(() => {
         setIsTrustedTokenIssuer(type === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.TRUSTED_TOKEN_ISSUER);
         setIsExpertMode(type === CommonAuthenticatorConstants.CONNECTION_TEMPLATE_IDS.EXPERT_MODE);
@@ -487,7 +501,7 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
             panes.push({
                 "data-tabid": "digital-credentials-claim-mapping",
                 menuItem: "Claim Mapping",
-                render: AttributeSettingsTabPane
+                render: DigitalCredentialsClaimMappingTabPane
             });
 
             return panes;
