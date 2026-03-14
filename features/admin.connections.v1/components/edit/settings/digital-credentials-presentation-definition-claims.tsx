@@ -21,12 +21,19 @@ import { addAlert } from "@wso2is/core/store";
 import { ContentLoader, LinkButton, PrimaryButton } from "@wso2is/react-components";
 import { AxiosError, AxiosResponse } from "axios";
 import isEmpty from "lodash-es/isEmpty";
-import React, { FunctionComponent, ReactElement, useEffect, useMemo, useState } from "react";
+import React, { FunctionComponent, ReactElement, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { Divider, Form, Icon, Input, Label } from "semantic-ui-react";
-import { getPresentationDefinitionClaims } from "../../../api/connections";
+import { getFederatedAuthenticatorDetails } from "../../../api/authenticators";
+import {
+    CreatePresentationDefinitionRequestInterface,
+    getPresentationDefinition,
+    PresentationDefinitionCredentialInterface,
+    PresentationDefinitionResponseInterface,
+    updatePresentationDefinition
+} from "../../../api/connections";
 import { ConnectionInterface, CommonPluggableComponentPropertyInterface } from "../../../models/connection";
 
 interface DigitalCredentialsPresentationDefinitionClaimsPropsInterface extends TestableComponentInterface {
@@ -51,22 +58,85 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
 
     const [ claims, setClaims ] = useState<string[]>([]);
     const [ draftClaim, setDraftClaim ] = useState<string>("");
+    const [ definitionName, setDefinitionName ] = useState<string>("");
+    const [ definitionDescription, setDefinitionDescription ] = useState<string>("");
+    const [ issuer, setIssuer ] = useState<string>("");
+    const [ vcType, setVcType ] = useState<string>("");
+    const [ vcPurpose, setVcPurpose ] = useState<string>("");
     const [ isLoading, setIsLoading ] = useState<boolean>(false);
+    const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
+    const [ presentationDefinitionId, setPresentationDefinitionId ] = useState<string>(undefined);
 
-    const presentationDefinitionId: string = useMemo(() => {
+    const resolvePresentationDefinitionIdFromIdentityProvider = (): string => {
+        const defaultAuthenticatorId: string = identityProvider?.federatedAuthenticators?.defaultAuthenticatorId;
+        const authenticators = identityProvider?.federatedAuthenticators?.authenticators ?? [];
+
+        const selectedAuthenticator = authenticators.find((authenticator: any) => {
+            return authenticator?.authenticatorId === defaultAuthenticatorId;
+        }) ?? authenticators[ 0 ];
+
         const authenticatorProperties: CommonPluggableComponentPropertyInterface[] =
-            identityProvider?.federatedAuthenticators?.authenticators?.[ 0 ]?.properties ?? [];
+            selectedAuthenticator?.properties ?? [];
 
         const pdProperty: CommonPluggableComponentPropertyInterface = authenticatorProperties.find(
             (property: CommonPluggableComponentPropertyInterface) => property.key === "presentationDefinitionId"
         );
 
         return pdProperty?.value;
-    }, [ identityProvider ]);
+    };
 
-    const fetchPresentationDefinitionClaims = async (): Promise<void> => {
+    const resolvePresentationDefinitionId = async (): Promise<void> => {
+        const idFromIdentityProvider: string = resolvePresentationDefinitionIdFromIdentityProvider();
+
+        if (!isEmpty(idFromIdentityProvider)) {
+            setPresentationDefinitionId(idFromIdentityProvider);
+
+            return;
+        }
+
+        const idpId: string = identityProvider?.id;
+        const defaultAuthenticatorId: string = identityProvider?.federatedAuthenticators?.defaultAuthenticatorId;
+
+        if (isEmpty(idpId) || isEmpty(defaultAuthenticatorId)) {
+            setPresentationDefinitionId(undefined);
+
+            return;
+        }
+
+        try {
+            const authenticatorDetails: any = await getFederatedAuthenticatorDetails(idpId, defaultAuthenticatorId);
+            const authenticatorProperties: CommonPluggableComponentPropertyInterface[] =
+                authenticatorDetails?.properties ?? [];
+
+            const pdProperty: CommonPluggableComponentPropertyInterface = authenticatorProperties.find(
+                (property: CommonPluggableComponentPropertyInterface) => property.key === "presentationDefinitionId"
+            );
+
+            setPresentationDefinitionId(pdProperty?.value);
+        } catch (error) {
+            setPresentationDefinitionId(undefined);
+        }
+    };
+
+    const updateFormFromDefinition = (definition: PresentationDefinitionResponseInterface): void => {
+        const firstCredential: PresentationDefinitionCredentialInterface = definition?.credentials?.[ 0 ];
+
+        setDefinitionName(definition?.name ?? "");
+        setDefinitionDescription(definition?.description ?? "");
+        setVcType(firstCredential?.type ?? "");
+        setVcPurpose(firstCredential?.purpose ?? "");
+        setIssuer(firstCredential?.issuer ?? "");
+        setClaims(firstCredential?.claims ?? []);
+    };
+
+    const fetchPresentationDefinition = async (): Promise<void> => {
         if (isEmpty(presentationDefinitionId)) {
             setClaims([]);
+            setDefinitionName("");
+            setDefinitionDescription("");
+            setVcType("");
+            setVcPurpose("");
+            setIssuer("");
 
             return;
         }
@@ -74,9 +144,10 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
         setIsLoading(true);
 
         try {
-            const response: AxiosResponse<string[]> = await getPresentationDefinitionClaims(presentationDefinitionId);
+            const response: AxiosResponse<PresentationDefinitionResponseInterface> =
+                await getPresentationDefinition(presentationDefinitionId);
 
-            setClaims(response?.data ?? []);
+            updateFormFromDefinition(response?.data);
         } catch (error) {
             const axiosError: AxiosError = error as AxiosError;
 
@@ -92,8 +163,55 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
         }
     };
 
+    const savePresentationDefinition = async (nextClaims?: string[]): Promise<void> => {
+        if (isReadOnly || isEmpty(presentationDefinitionId)) {
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        const payload: CreatePresentationDefinitionRequestInterface = {
+            credentials: [
+                {
+                    claims: nextClaims ?? claims,
+                    issuer,
+                    purpose: vcPurpose,
+                    type: vcType
+                }
+            ],
+            description: definitionDescription,
+            name: definitionName
+        };
+
+        try {
+            await updatePresentationDefinition(presentationDefinitionId, payload);
+
+            dispatch(addAlert({
+                description: "Presentation definition updated successfully.",
+                level: AlertLevels.SUCCESS,
+                message: "Presentation definition updated"
+            }));
+        } catch (error) {
+            const axiosError: AxiosError = error as AxiosError;
+
+            dispatch(addAlert({
+                description: axiosError?.response?.data?.description
+                    ? axiosError.response.data.description
+                    : t("authenticationProvider:notifications.addIDP.genericError.description"),
+                level: AlertLevels.ERROR,
+                message: "Failed to update presentation definition"
+            }));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     useEffect(() => {
-        fetchPresentationDefinitionClaims();
+        resolvePresentationDefinitionId();
+    }, [ identityProvider?.id, identityProvider?.federatedAuthenticators?.defaultAuthenticatorId ]);
+
+    useEffect(() => {
+        fetchPresentationDefinition();
     }, [ presentationDefinitionId ]);
 
     const onAddClaim = (): void => {
@@ -103,20 +221,20 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
             return;
         }
 
-        setClaims([ ...claims, nextClaim ]);
+        const updatedClaims: string[] = [ ...claims, nextClaim ];
+
+        setClaims(updatedClaims);
         setDraftClaim("");
     };
 
     const onRemoveClaim = (claim: string): void => {
-        setClaims(claims.filter((item: string) => item !== claim));
+        const updatedClaims: string[] = claims.filter((item: string) => item !== claim);
+
+        setClaims(updatedClaims);
     };
 
     const onSaveChanges = (): void => {
-        dispatch(addAlert({
-            description: "Claim editing UI is available. Claim update API integration can be wired to persist changes.",
-            level: AlertLevels.INFO,
-            message: "Presentation definition claims updated in UI"
-        }));
+        savePresentationDefinition();
     };
 
     if (isLoading) {
@@ -125,12 +243,42 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
 
     return (
         <div data-testid={ testId }>
-            <p>
-                Presentation Definition ID: <strong>{ presentationDefinitionId || "Not available" }</strong>
-            </p>
-            <Divider hidden />
-
             <Form>
+                <Form.Field>
+                    <label>VC Type</label>
+                    <Input
+                        value={ vcType }
+                        readOnly={ isReadOnly }
+                        onChange={ (_event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => {
+                            setVcType(data.value);
+                        } }
+                    />
+                </Form.Field>
+
+                <Form.Field>
+                    <label>VC Description</label>
+                    <Input
+                        value={ vcPurpose }
+                        readOnly={ isReadOnly }
+                        onChange={ (_event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => {
+                            setVcPurpose(data.value);
+                        } }
+                    />
+                </Form.Field>
+
+                <Form.Field>
+                    <label>Issuer</label>
+                    <Input
+                        value={ issuer }
+                        readOnly={ isReadOnly }
+                        onChange={ (_event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => {
+                            setIssuer(data.value);
+                        } }
+                    />
+                </Form.Field>
+
+                <Divider hidden />
+
                 <Form.Field>
                     <label>Claims</label>
                     {
@@ -167,15 +315,15 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                                     } }
                                 />
                             </Form.Field>
-                            <PrimaryButton type="button" onClick={ onSaveChanges }>
-                                Save claims
+                            <PrimaryButton type="button" loading={ isSubmitting } onClick={ onSaveChanges }>
+                                Update
                             </PrimaryButton>
                         </>
                     )
                 }
 
-                <LinkButton type="button" onClick={ fetchPresentationDefinitionClaims }>
-                    Refresh claims
+                <LinkButton type="button" onClick={ fetchPresentationDefinition }>
+                    Refresh
                 </LinkButton>
             </Form>
         </div>

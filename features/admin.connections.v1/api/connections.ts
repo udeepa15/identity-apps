@@ -105,6 +105,10 @@ export interface CreatePresentationDefinitionResponseInterface {
     [ key: string ]: unknown;
 }
 
+export interface PresentationDefinitionResponseInterface extends CreatePresentationDefinitionRequestInterface {
+    id: string;
+}
+
 /**
  * Function to create an OpenID4VP presentation definition.
  *
@@ -131,6 +135,75 @@ export const createPresentationDefinition = (
         .then((response: AxiosResponse<CreatePresentationDefinitionResponseInterface>) => {
             if (response.status !== 201 && response.status !== 200) {
                 return Promise.reject(new Error("Failed to create the presentation definition."));
+            }
+
+            return Promise.resolve(response);
+        }).catch((error: AxiosError) => {
+            return Promise.reject(error);
+        });
+};
+
+/**
+ * Function to get a presentation definition by ID.
+ *
+ * @param presentationDefinitionId - Presentation definition identifier.
+ */
+export const getPresentationDefinition = (
+    presentationDefinitionId: string
+): Promise<AxiosResponse<PresentationDefinitionResponseInterface>> => {
+
+    const identityProvidersEndpoint: string = store.getState().config.endpoints.identityProviders;
+    const apiServerBaseUrl: string = identityProvidersEndpoint.substring(0, identityProvidersEndpoint.lastIndexOf("/"));
+
+    const requestConfig: AxiosRequestConfig = {
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        method: HttpMethods.GET,
+        url: `${ apiServerBaseUrl }/vp/template/${ presentationDefinitionId }`
+    };
+
+    return httpClient(requestConfig)
+        .then((response: AxiosResponse<PresentationDefinitionResponseInterface>) => {
+            if (response.status !== 200) {
+                return Promise.reject(new Error("Failed to fetch presentation definition."));
+            }
+
+            return Promise.resolve(response);
+        }).catch((error: AxiosError) => {
+            return Promise.reject(error);
+        });
+};
+
+/**
+ * Function to update a presentation definition.
+ *
+ * @param presentationDefinitionId - Presentation definition identifier.
+ * @param payload - Presentation definition payload.
+ */
+export const updatePresentationDefinition = (
+    presentationDefinitionId: string,
+    payload: CreatePresentationDefinitionRequestInterface
+): Promise<AxiosResponse<PresentationDefinitionResponseInterface>> => {
+
+    const identityProvidersEndpoint: string = store.getState().config.endpoints.identityProviders;
+    const apiServerBaseUrl: string = identityProvidersEndpoint.substring(0, identityProvidersEndpoint.lastIndexOf("/"));
+
+    const requestConfig: AxiosRequestConfig = {
+        data: payload,
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        method: HttpMethods.PUT,
+        url: `${ apiServerBaseUrl }/vp/template/${ presentationDefinitionId }`
+    };
+
+    return httpClient(requestConfig)
+        .then((response: AxiosResponse<PresentationDefinitionResponseInterface>) => {
+            if (response.status !== 200) {
+                return Promise.reject(new Error("Failed to update presentation definition."));
             }
 
             return Promise.resolve(response);
