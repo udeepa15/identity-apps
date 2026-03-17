@@ -478,9 +478,13 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
         const panes: ResourceTabPaneInterface[] = [];
 
         if (isDigitalCredentialsConnection) {
+            if (tabPaneExtensions && tabPaneExtensions.length > 0) {
+                panes.push(...tabPaneExtensions);
+            }
+
             panes.push({
                 "data-tabid": "digital-credentials-configuration",
-                menuItem: "Configuration",
+                menuItem: "General",
                 render: DigitalCredentialsConfigurationTabPane
             });
 
@@ -492,9 +496,42 @@ export const EditConnection: FunctionComponent<EditConnectionPropsInterface> = (
 
             panes.push({
                 "data-tabid": "digital-credentials-claim-mapping",
-                menuItem: "Claim Mapping",
+                menuItem: "Attributes",
                 render: DigitalCredentialsClaimMappingTabPane
             });
+
+            if (
+                shouldShowTab(type, ConnectionTabTypes.CONNECTED_APPS) &&
+                hasApplicationReadPermissions
+            ) {
+                panes.push({
+                    "data-tabid": ConnectionUIConstants.TabIds.CONNECTED_APPS,
+                    menuItem: "Connected Apps",
+                    render: ConnectedAppsTabPane
+                });
+            }
+
+            if (
+                shouldShowTab(type, ConnectionTabTypes.JIT_PROVISIONING) &&
+                identityProviderConfig.editIdentityProvider.showJitProvisioning
+            ) {
+                panes.push({
+                    "data-tabid": ConnectionUIConstants.TabIds.JIT_PROVISIONING,
+                    menuItem: identityProviderConfig.jitProvisioningSettings?.menuItemName,
+                    render: JITProvisioningSettingsTabPane
+                });
+            }
+
+            if (
+                shouldShowTab(type, ConnectionTabTypes.ADVANCED) &&
+                identityProviderConfig.editIdentityProvider.showAdvancedSettings
+            ) {
+                panes.push({
+                    "data-tabid": ConnectionUIConstants.TabIds.ADVANCED,
+                    menuItem: "Advanced",
+                    render: AdvancedSettingsTabPane
+                });
+            }
 
             return panes;
         }

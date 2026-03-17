@@ -18,7 +18,7 @@
 
 import { AlertLevels, TestableComponentInterface } from "@wso2is/core/models";
 import { addAlert } from "@wso2is/core/store";
-import { ContentLoader, LinkButton, PrimaryButton } from "@wso2is/react-components";
+import { ContentLoader, PrimaryButton } from "@wso2is/react-components";
 import { AxiosError, AxiosResponse } from "axios";
 import isEmpty from "lodash-es/isEmpty";
 import React, { FunctionComponent, ReactElement, useEffect, useState } from "react";
@@ -58,7 +58,6 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
     const dispatch: Dispatch = useDispatch();
 
     const [ claims, setClaims ] = useState<string[]>([]);
-    const [ draftClaim, setDraftClaim ] = useState<string>("");
     const [ definitionName, setDefinitionName ] = useState<string>("");
     const [ definitionDescription, setDefinitionDescription ] = useState<string>("");
     const [ issuer, setIssuer ] = useState<string>("");
@@ -215,25 +214,6 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
         fetchPresentationDefinition();
     }, [ presentationDefinitionId ]);
 
-    const onAddClaim = (): void => {
-        const nextClaim: string = draftClaim?.trim();
-
-        if (isEmpty(nextClaim) || claims.includes(nextClaim)) {
-            return;
-        }
-
-        const updatedClaims: string[] = [ ...claims, nextClaim ];
-
-        setClaims(updatedClaims);
-        setDraftClaim("");
-    };
-
-    const onRemoveClaim = (claim: string): void => {
-        const updatedClaims: string[] = claims.filter((item: string) => item !== claim);
-
-        setClaims(updatedClaims);
-    };
-
     const onSaveChanges = (): void => {
         if (isEmpty(vcType?.trim()) || isEmpty(vcPurpose?.trim()) || isEmpty(issuer?.trim())) {
             dispatch(addAlert({
@@ -313,11 +293,6 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                             ? claims.map((claim: string) => (
                                 <Label key={ claim } size="large" style={ { marginBottom: "0.5rem" } }>
                                     { claim }
-                                    {
-                                        !isReadOnly && (
-                                            <Icon name="delete" onClick={ () => onRemoveClaim(claim) }/>
-                                        )
-                                    }
                                 </Label>
                             ))
                             : <p>No claims found in the selected presentation definition.</p>
@@ -327,21 +302,6 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                 {
                     !isReadOnly && (
                         <>
-                            <Form.Field>
-                                <label>Add attribute</label>
-                                <Input
-                                    value={ draftClaim }
-                                    placeholder="Enter attribute name (e.g., email)"
-                                    onChange={ (_event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => {
-                                        setDraftClaim(data.value);
-                                    } }
-                                    action={ {
-                                        content: "Add",
-                                        onClick: onAddClaim,
-                                        type: "button"
-                                    } }
-                                />
-                            </Form.Field>
                             <PrimaryButton
                                 type="button"
                                 loading={ isSubmitting }
@@ -359,9 +319,6 @@ export const DigitalCredentialsPresentationDefinitionClaims: FunctionComponent<
                     )
                 }
 
-                <LinkButton type="button" onClick={ fetchPresentationDefinition }>
-                    Refresh
-                </LinkButton>
             </Form>
         </div>
     );

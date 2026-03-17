@@ -58,9 +58,7 @@ interface DigitalCredentialsConnectionCreateWizardPropsInterface extends
 }
 
 interface DigitalCredentialWizardFormValuesInterface {
-    description?: string;
     name: string;
-    vcDescription: string;
     vcIssuer: string;
     vcType: string;
 }
@@ -96,9 +94,7 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
     const eventPublisher: EventPublisher = EventPublisher.getInstance();
 
     const initialValues: DigitalCredentialWizardFormValuesInterface = {
-        description: "Minimal OpenID4VP connection - extracts all VC claims (no filtering)",
         name: "Digital Credentials",
-        vcDescription: "Please share your employee badge to prove employment.",
         vcIssuer: "did:web:masked-unprofitably-ardith.ngrok-free.dev",
         vcType: "EmployeeBadge"
     };
@@ -130,17 +126,15 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
             {
                 claims: [],
                 issuer: values.vcIssuer,
-                purpose: values.vcDescription,
+                purpose: "Please share your verifiable credential.",
                 type: values.vcType
             }
         ];
 
         const presentationDefinitionName: string = values.name;
-        const presentationDefinitionDescription: string = values.description;
 
         const pdRequest: CreatePresentationDefinitionRequestInterface = {
             credentials,
-            description: presentationDefinitionDescription,
             name: presentationDefinitionName
         };
 
@@ -155,7 +149,7 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
         const connection: ConnectionInterface = cloneDeep(template.idp);
 
         connection.name = values.name;
-        connection.description = values.description;
+        connection.description = "";
         connection.templateId = template.templateId;
 
         connection.federatedAuthenticators.authenticators[ 0 ].properties = [
@@ -229,7 +223,6 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
 
                 errors.name = composeValidators(required, length({ max: 50, min: 3 }))(values.name);
                 errors.vcType = composeValidators(required, length({ max: 100, min: 3 }))(values.vcType);
-                errors.vcDescription = composeValidators(required, length({ max: 500, min: 3 }))(values.vcDescription);
                 errors.vcIssuer = composeValidators(required, length({ max: 2048, min: 3 }))(values.vcIssuer);
 
                 setNextShouldBeDisabled(ifFieldsHave(errors));
@@ -240,7 +233,7 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
             <Field.Input
                 ariaLabel="Connection name"
                 name="name"
-                label="Connection Name"
+                label="Name"
                 inputType="resource_name"
                 required={ true }
                 maxLength={ 50 }
@@ -249,20 +242,9 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
                 placeholder="OID4VP Test1"
             />
             <Field.Input
-                ariaLabel="Connection description"
-                name="description"
-                label="Description"
-                inputType="description"
-                required={ false }
-                maxLength={ 300 }
-                minLength={ 0 }
-                width={ 15 }
-                placeholder="Minimal OpenID4VP connection - extracts all VC claims (no filtering)"
-            />
-            <Field.Input
-                ariaLabel="VC type"
+                ariaLabel="Credential type"
                 name="vcType"
-                label="VC Type"
+                label="Credential Type"
                 inputType="text"
                 required={ true }
                 maxLength={ 100 }
@@ -271,20 +253,9 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
                 placeholder="EmployeeBadge"
             />
             <Field.Input
-                ariaLabel="VC description"
-                name="vcDescription"
-                label="VC Description"
-                inputType="description"
-                required={ true }
-                maxLength={ 500 }
-                minLength={ 3 }
-                width={ 15 }
-                placeholder="Please share your employee badge to prove employment."
-            />
-            <Field.Input
-                ariaLabel="VC issuer"
+                ariaLabel="Trusted issuer"
                 name="vcIssuer"
-                label="VC Issuer"
+                label="Trusted Issuer"
                 inputType="text"
                 required={ true }
                 maxLength={ 2048 }
@@ -312,19 +283,11 @@ export const DigitalCredentialsConnectionCreateWizard: FunctionComponent<
                                     hint: "Provide a unique name for the connection."
                                 },
                                 {
-                                    fieldName: "Description",
-                                    hint: "Provide a short description for the connection."
-                                },
-                                {
-                                    fieldName: "VC Type",
+                                    fieldName: "Credential Type",
                                     hint: "Provide the verifiable credential type (for example EmployeeBadge)."
                                 },
                                 {
-                                    fieldName: "VC Description",
-                                    hint: "Provide the purpose shown to users when requesting the credential."
-                                },
-                                {
-                                    fieldName: "VC Issuer",
+                                    fieldName: "Trusted Issuer",
                                     hint: "Provide the trusted issuer DID or URL used in presentation definition creation."
                                 }
                             ],

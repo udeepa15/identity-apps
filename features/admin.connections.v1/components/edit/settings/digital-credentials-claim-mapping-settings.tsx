@@ -16,28 +16,10 @@
  * under the License.
  */
 
-import { AlertLevels, TestableComponentInterface } from "@wso2is/core/models";
-import { addAlert } from "@wso2is/core/store";
-import { AxiosError, AxiosResponse } from "axios";
-import isEmpty from "lodash-es/isEmpty";
-import React, { FunctionComponent, ReactElement, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
-import { Dispatch } from "redux";
-import { getFederatedAuthenticatorDetails } from "../../../api/authenticators";
-import { getPresentationDefinitionClaims } from "../../../api/connections";
-import { ConnectionInterface, CommonPluggableComponentPropertyInterface } from "../../../models/connection";
+import { TestableComponentInterface } from "@wso2is/core/models";
+import React, { FunctionComponent, ReactElement } from "react";
+import { ConnectionInterface } from "../../../models/connection";
 import { AttributeSettings } from "./attribute-settings";
-
-interface PresentationDefinitionClaimInterface {
-    name?: string;
-    path?: string;
-}
-
-interface PresentationDefinitionDescriptorClaimsInterface {
-    claims?: PresentationDefinitionClaimInterface[];
-    inputDescriptorId?: string;
-}
 
 interface DigitalCredentialsClaimMappingSettingsPropsInterface extends TestableComponentInterface {
     identityProvider: ConnectionInterface;
@@ -68,130 +50,6 @@ export const DigitalCredentialsClaimMappingSettings: FunctionComponent<
         [ "data-testid" ]: testId = "digital-credentials-claim-mapping-settings"
     } = props;
 
-    const dispatch: Dispatch = useDispatch();
-    const { t } = useTranslation();
-
-    const [ presentationDefinitionId, setPresentationDefinitionId ] = useState<string>(undefined);
-    const [ allowedMappedValues, setAllowedMappedValues ] = useState<string[]>([]);
-    const [ isClaimsLoading, setIsClaimsLoading ] = useState<boolean>(false);
-
-    const resolvePresentationDefinitionIdFromIdentityProvider = (): string => {
-        const defaultAuthenticatorId: string = identityProvider?.federatedAuthenticators?.defaultAuthenticatorId;
-        const authenticators = identityProvider?.federatedAuthenticators?.authenticators ?? [];
-
-        const selectedAuthenticator = authenticators.find((authenticator: any) => {
-            return authenticator?.authenticatorId === defaultAuthenticatorId;
-        }) ?? authenticators[ 0 ];
-
-        const authenticatorProperties: CommonPluggableComponentPropertyInterface[] =
-            selectedAuthenticator?.properties ?? [];
-
-        const pdProperty: CommonPluggableComponentPropertyInterface = authenticatorProperties.find(
-            (property: CommonPluggableComponentPropertyInterface) => property.key === "presentationDefinitionId"
-        );
-
-        return pdProperty?.value;
-    };
-
-    const resolvePresentationDefinitionId = async (): Promise<void> => {
-        const idFromIdentityProvider: string = resolvePresentationDefinitionIdFromIdentityProvider();
-
-        if (!isEmpty(idFromIdentityProvider)) {
-            setPresentationDefinitionId(idFromIdentityProvider);
-
-            return;
-        }
-
-        const idpId: string = identityProvider?.id;
-        const defaultAuthenticatorId: string = identityProvider?.federatedAuthenticators?.defaultAuthenticatorId;
-
-        if (isEmpty(idpId) || isEmpty(defaultAuthenticatorId)) {
-            setPresentationDefinitionId(undefined);
-
-            return;
-        }
-
-        try {
-            const authenticatorDetails: any = await getFederatedAuthenticatorDetails(idpId, defaultAuthenticatorId);
-            const authenticatorProperties: CommonPluggableComponentPropertyInterface[] =
-                authenticatorDetails?.properties ?? [];
-
-            const pdProperty: CommonPluggableComponentPropertyInterface = authenticatorProperties.find(
-                (property: CommonPluggableComponentPropertyInterface) => property.key === "presentationDefinitionId"
-            );
-
-            setPresentationDefinitionId(pdProperty?.value);
-        } catch (_error) {
-            setPresentationDefinitionId(undefined);
-        }
-    };
-
-    const extractAllowedMappedValues = (
-        response: AxiosResponse<any>
-    ): string[] => {
-        const data: unknown = response?.data;
-
-        if (!Array.isArray(data)) {
-            return [];
-        }
-
-        const claimNames: string[] = (data as PresentationDefinitionDescriptorClaimsInterface[])
-            .flatMap((descriptor: PresentationDefinitionDescriptorClaimsInterface) => {
-                if (!Array.isArray(descriptor?.claims)) {
-                    return [];
-                }
-
-                return descriptor.claims
-                    .map((claim: PresentationDefinitionClaimInterface) => claim?.name?.trim())
-                    .filter((claimName: string) => !isEmpty(claimName));
-            });
-
-        return [ ...new Set(claimNames) ];
-    };
-
-    const fetchPresentationDefinitionClaims = async (): Promise<void> => {
-        if (isEmpty(presentationDefinitionId)) {
-            setAllowedMappedValues([]);
-
-            return;
-        }
-
-        setIsClaimsLoading(true);
-
-        try {
-            const response: AxiosResponse<any> = await getPresentationDefinitionClaims(presentationDefinitionId);
-            const extractedClaims: string[] = extractAllowedMappedValues(response);
-
-            setAllowedMappedValues(extractedClaims);
-        } catch (error) {
-            setAllowedMappedValues([]);
-
-            const axiosError: AxiosError = error as AxiosError;
-
-            dispatch(addAlert({
-                description: axiosError?.response?.data?.description
-                    ? axiosError.response.data.description
-                    : t("authenticationProvider:notifications.addIDP.genericError.description"),
-                level: AlertLevels.ERROR,
-                message: "Failed to fetch presentation definition claims"
-            }));
-        } finally {
-            setIsClaimsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        resolvePresentationDefinitionId();
-    }, [ identityProvider?.id, identityProvider?.federatedAuthenticators?.defaultAuthenticatorId ]);
-
-    useEffect(() => {
-        fetchPresentationDefinitionClaims();
-    }, [ presentationDefinitionId ]);
-
-    if (isClaimsLoading) {
-        return loader();
-    }
-
     return (
         <AttributeSettings
             idpId={ identityProvider?.id }
@@ -202,12 +60,11 @@ export const DigitalCredentialsClaimMappingSettings: FunctionComponent<
             hideIdentityClaimAttributes={ false }
             isRoleMappingsEnabled={ true }
             data-testid={ `${ testId }-attribute-settings` }
-            provisioningAttributesEnabled={ false }
+            provisioningAttributesEnabled={ true }
             isReadOnly={ isReadOnly }
             loader={ loader }
             isOIDC={ false }
             isSaml={ false }
-            allowedMappedValues={ allowedMappedValues }
         />
     );
 };
